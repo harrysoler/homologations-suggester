@@ -2,7 +2,7 @@ from typing import Protocol
 
 from entities import OldPensumSubject, NewPensumSubject
 
-class ProjectRepository(Protocol):
-    def find_homologable_subjects(subjects: list[OldPensumSubject]) -> list[NewPensumSubject]:
+class SubjectRepository(Protocol):
+    def find_homologable_subject_for(subject: OldPensumSubject) -> NewPensumSubject:
         ...
 

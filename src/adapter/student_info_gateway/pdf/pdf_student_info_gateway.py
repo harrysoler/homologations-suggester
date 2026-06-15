@@ -10,9 +10,6 @@ from student_info_gateway import StudentInfoGateway
 STUDENT_NAME_REGEX = r"Estudiante[\s\n]+Identificaci.+n:\s+\d+\s+(.+?)(?:Código:)"
 STUDENT_ID_REGEX = r"Identificaci.+n:\s+(\d+)"
 
-# To detect where is the table header search the following terms
-SUBJECT_LIST_HEADER_SUBSTRINGS = ["CODIGO", "MATERIA"]
-
 class PDFStudentInfoGateway(StudentInfoGateway):
     """
     Extracts students grades and core information from a Grades Historic PDF
@@ -108,7 +105,6 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         if not raw_subject_parts:
             return None
 
-
         # sometimes there is only left the final grade
         if len(raw_subject_parts) == 1:
             return float(raw_subject_parts[0])
@@ -128,9 +124,6 @@ class PDFStudentInfoGateway(StudentInfoGateway):
 
         # return the parts after columns "H" and "C"
         return parts[split_index + 3:] if split_index else None
-
-    def _is_string_subjects_header(self, text: str) -> bool:
-        return all(contains in text.upper() for contains in SUBJECT_LIST_HEADER_SUBSTRINGS)
 
     def _find_index_with_condition(self, condition: Callable[[str], bool], items: list[str]) -> int | None:
         return next(

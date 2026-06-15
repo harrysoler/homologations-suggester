@@ -87,8 +87,8 @@ class PDFStudentInfoGateway(StudentInfoGateway):
 
         final_grade = self._extract_final_grade_from(parts)
 
-        # if not final_grade:
-        #     return None
+        if not final_grade:
+            return None
 
         return (subject_code, final_grade)
 

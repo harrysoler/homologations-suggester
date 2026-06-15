@@ -97,7 +97,7 @@ insert into new_curriculum_subject (code, name, credits, semester) values
 (10240, 'FILOSOFIA INSTITUCIONAL', 2, 1),
 (41111, 'INTRODUCCION A LA INGENIERIA SISTEMAS', 3, 1),
 (15650, 'LENGUA EXTRANJERA I', 2, 1),
-(31160, 'PROGRAMACION ESTRUCTURADA PARA', 2, 1),
+(31160, 'PROGRAMACION ESTRUCTURADA PARA INGENIERÍAS', 2, 1),
 
 -- Semester 2
 (96500, 'BASES DE DATOS', 3, 2),
@@ -178,14 +178,14 @@ insert into prerequisite (subject_code, prerequisite_subject_code) values
 
 insert into homologable(old_subject_code, new_subject_code) values
 (96110,11701), -- calculo diferencial
-(41112,31166), -- introducción a la programación -> programacion para ingenierias
+(41112,31160), -- introducción a la programación -> programacion para ingenierias
 (96111,96103), -- algebra lineal
-(95125,15658), -- ingles 1 -> lengua extranjera 1
+(95125,15650), -- ingles 1 -> lengua extranjera 1
 (95108,10240), -- filosofia institucional
 (41111,41111), -- introducción a la ing de sistemas
 (96113,96113), -- calculo integral
 (83007,30115), -- metodos numericos
-(30107,91058), -- probabilidad y estadistica
+(30107,91504), -- probabilidad y estadistica
 (95127,15651), -- ingles 2 -> lengua extranjera 2
 (96181,96181), -- programación orientada a objetos
 (96500,96500), -- bases de datos

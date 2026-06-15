@@ -1,8 +1,21 @@
+# Entrada
+
+El archivo PDF del historico de notas para extraer los siguientes datos:
+
+- Nombre
+- Semestre (nivel más bajo)
+- Documento de identidad
+- Número total de créditos homologados
+- Asignaturas aprobadas
+
+# Salida
+
 El resultado final para cada historico debe incluir los espacios del formato requerido:
 
 - Nombre del estudiante
 - Nivel de formación (semestre)
-- Tipo de documento
+- Tipo de documento (no se puede extraer)
+- Documento de identidad
 - Tipo de homologación o reconocimiento de créditos = "Trancisión de plan de estudios"
 - Institución de educación superior de destino = "Universidad Santo Tomás"
 - Ciudad = "Tunja"
@@ -49,7 +62,5 @@ Homologable: Asignaturas homologables entre pensums
 
 # Fases de ejecución
 
-1. Verificar creditos disponibles (> 0)
 2. Listar asignaturas homologables
 3. Filtrar prerequisitos
-4. Limitar a rango de créditos disponibles (priorizar materias de la carrera si sobran materias, agregar materias del siguiente semestre si sobran créditos)

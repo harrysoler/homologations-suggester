@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from logging import Logger
 
+import utils
 from student_info_gateway import StudentInfoGateway
 from shared_types import StudentGrades, SubjectCode, Grade
 from subject_repository import SubjectRepository
@@ -21,7 +22,10 @@ class SuggestSubjectsService:
         passed_subjects = list(map(self._find_homologable_subject, passed_subject_grades.items()))
 
         # filter the homologable subjects
-        return list(filter(None, passed_subjects))
+        passed_subjects = list(filter(None, passed_subjects))
+
+        # homologated subjects cant repeat
+        return utils.remove_duplicates_for_attribute('target_subject.code', passed_subjects)
 
     def _find_homologable_subject(self, subject_data: tuple[SubjectCode, Grade]) -> ApprovedSubject:
         code, grade = subject_data
@@ -45,14 +49,9 @@ class SuggestSubjectsService:
         if old_pensum_subject:
             return old_pensum_subject
 
-        new_pensum_subject = self._subject_repository.find_new_subject_by_code(code)
-
-        if new_pensum_subject:
-            return new_pensum_subject
-
         self._logger.error("subject %s not found in subjects", code)
 
-        return None
+        raise ValueError(f"subject {code} not found in old pensum list")
     
     def _filter_approved_subjects(self, subjects: StudentGrades) -> StudentGrades:
         return {code: grade for code, grade in subjects.items() if self._is_grade_approved(grade)}

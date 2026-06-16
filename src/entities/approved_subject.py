@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from entities import OldPensumSubject, NewPensumSubject
+from shared_types import Grade
 
 @dataclass(frozen=True)
 class ApprovedSubject:
@@ -9,12 +10,14 @@ class ApprovedSubject:
     pensum
     """
     origin_subject: OldPensumSubject
-    destination_subject: NewPensumSubject
+    grade: Grade
+
+    target_subject: NewPensumSubject
 
     def __post_init__(self):
         if self.origin_subject is None:
             raise ValueError("origin_subject must not be None")
 
-        if self.destination_subject is None:
-            raise ValueError("destination_subject must not be None")
+        if self.target_subject is None:
+            raise ValueError("target_subject must not be None")
 

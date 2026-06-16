@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from logging import Logger
 
 from student_info_gateway import StudentInfoGateway
-from shared_types import StudentGrades, SubjectCode
+from shared_types import StudentGrades, SubjectCode, Grade
 from subject_repository import SubjectRepository
 from entities import ApprovedSubject, OldPensumSubject, NewPensumSubject
 
@@ -15,15 +15,19 @@ class SuggestSubjectsService:
     def suggest_homologable_subjects(self) -> list[ApprovedSubject]:
         student_grades: StudentGrades = self._student_info_gateway.get_graded_subjects()
 
-        passed_subject_codes = self._filter_approved_subjects(student_grades)
+        passed_subject_grades = self._filter_approved_subjects(student_grades)
 
         # find metadata of old passed subjects
-        passed_subjects = list(map(self._find_subject_by_code, passed_subject_codes))
+        passed_subjects = list(map(self._find_homologable_subject, passed_subject_grades.items()))
 
         # filter the homologable subjects
-        return list(filter(None, map(self._find_homologable_subject, passed_subjects)))
+        return list(filter(None, passed_subjects))
 
-    def _find_homologable_subject(self, old_subject: OldPensumSubject | NewPensumSubject) -> ApprovedSubject:
+    def _find_homologable_subject(self, subject_data: tuple[SubjectCode, Grade]) -> ApprovedSubject:
+        code, grade = subject_data
+
+        old_subject = self._find_subject_by_code(code)
+
         if isinstance(old_subject, NewPensumSubject):
             return None
 
@@ -32,7 +36,7 @@ class SuggestSubjectsService:
         if not homologable_subject:
             return None
 
-        return ApprovedSubject(old_subject, homologable_subject)
+        return ApprovedSubject(old_subject, grade, homologable_subject)
 
     # A previously approved subject can be from the old or new pensum
     def _find_subject_by_code(self, code: SubjectCode) -> OldPensumSubject | NewPensumSubject | None:
@@ -50,10 +54,8 @@ class SuggestSubjectsService:
 
         return None
     
-    def _filter_approved_subjects(self, subjects: StudentGrades) -> list[SubjectCode]:
-        return [
-            subject_id for subject_id, grade in subjects.items() if self._is_grade_approved(grade)
-        ]
+    def _filter_approved_subjects(self, subjects: StudentGrades) -> StudentGrades:
+        return {code: grade for code, grade in subjects.items() if self._is_grade_approved(grade)}
 
     def _is_grade_approved(self, grade: float) -> bool:
         return grade >= 3.0

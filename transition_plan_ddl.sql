@@ -1,6 +1,7 @@
 drop table if exists prerequisite;
 drop table if exists homologable;
-drop table if exists subject;
+drop table if exists old_curriculum_subject;
+drop table if exists new_curriculum_subject;
 
 create table old_curriculum_subject (
 	code                int primary key,
@@ -95,6 +96,7 @@ insert into new_curriculum_subject (code, name, credits, semester) values
 (11701, 'CALCULO DIFERENCIAL', 3, 1),
 (31161, 'DISEÑO WEB', 3, 1),
 (10240, 'FILOSOFIA INSTITUCIONAL', 2, 1),
+(99102, 'CATEDRA HENRI DIDON I', 0, 1),
 (41111, 'INTRODUCCION A LA INGENIERIA SISTEMAS', 3, 1),
 (15650, 'LENGUA EXTRANJERA I', 2, 1),
 (31160, 'PROGRAMACION ESTRUCTURADA PARA INGENIERÍAS', 2, 1),

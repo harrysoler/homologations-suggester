@@ -12,7 +12,7 @@ from student_info_gateway import StudentInfoGateway
 STUDENT_NAME_REGEX = r"Estudiante[\s\n]+Identificaci.+n:\s+\d+\s+(.+?)(?:Código:)"
 STUDENT_ID_REGEX = r"Identificaci.+n:\s+(\d+)"
 
-REGISTRATION_STATUS_VALUES = ["Matriculado", "Repite", "vez"]
+REGISTRATION_STATUS_VALUES = ["Matriculado", "vez", "Repite"]
 
 class PDFStudentInfoGateway(StudentInfoGateway):
     """
@@ -27,7 +27,7 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         if Path(pdf_path).suffix != ".pdf":
             raise ValueError(f"Unsupported file format: {pdf_path}")
 
-        self._logger.debug("opening pdf file: %s", pdf_path)
+        self._logger.info("opening pdf file: %s", pdf_path)
         self._reader = PdfReader(pdf_path)
         self._text = " ".join(page.extract_text() for page in self._reader.pages)
 
@@ -52,10 +52,13 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         raise ValueError("Could not extract student identification from PDF")
 
     def get_graded_subjects(self) -> StudentGrades:
-        raw_lines = self._text.split("\n")
+        # split the text by breaklines and spaces
+        raw_lines = re.split(r"[\n ]+", self._text)
+
         raw_subject_lines = self._extract_subjects_tables_content(raw_lines)
 
         cleaned_subject_lines = utils.flatten(list(map(utils.split_and_strip, raw_subject_lines)))
+
         raw_subjects = self._split_lines_by_subject(cleaned_subject_lines)
 
         # when converted to dict the last grade with the same key (subject code) wins
@@ -67,7 +70,7 @@ class PDFStudentInfoGateway(StudentInfoGateway):
 
     def _extract_subjects_tables_content(self, lines: list[str]) -> list[str]:
         table_prefixes = [index for index, item in enumerate(lines) if item in "Fall."]
-        table_suffixes = [index for index, item in enumerate(lines) if item in "H:  Horas Semanales  C:  Créditos  S:  Sesiones  HS:  Horas  "]
+        table_suffixes = [index for index, item in enumerate(lines) if "H:" in item]
 
         table_content_ranges = list(zip(table_prefixes, table_suffixes))
 
@@ -98,18 +101,24 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         return input.isdigit() and len(input) == 5
 
     def _extract_subject(self, parts: list[str]) -> tuple[SubjectCode, Grade] | None:
+        self._logger.debug("extracting subject from: %s", parts)
+
         # the first part is always the code
         subject_code = self._extract_subject_code_from(parts[0])
 
         if not subject_code:
+            self._logger.debug("subject code not found")
             return None
 
         final_grade = self._extract_final_grade_from(parts)
 
-        if not final_grade:
+        if final_grade is None:
+            self._logger.debug("subject grade not found")
             return None
 
-        return (subject_code, final_grade)
+        result = (subject_code, final_grade)
+
+        return result
 
     def _extract_subject_code_from(self, input: str) -> SubjectCode | None:
         if input.isdigit() and len(input) == 5:
@@ -144,11 +153,16 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         # get index where the item is "Matriculado" or "Repite"
         split_index = utils.search_index_by_any_match(REGISTRATION_STATUS_VALUES, parts)
 
+        if not split_index:
+            return None
+
         # the parts after columns "H" and "C"
-        result = parts[split_index + 3:] if split_index else None
+        result = parts[split_index + 3:]
 
         # in the unfortunate case the pdf page is splitted in a row
-        return utils.remove_last_str_items_until_digit_found(result)
+        result = utils.remove_last_str_items_until_digit_found(result)
+
+        return result
 
     def _find_index_with_condition(self, condition: Callable[[str], bool], items: list[str]) -> int | None:
         return next(

@@ -1,14 +1,65 @@
 import sqlite3
+from logging import Logger
 
 from subject_repository import SubjectRepository
 from entities import OldPensumSubject, NewPensumSubject
 
 
 class SQLiteSubjectRepository(SubjectRepository):
-    def __init__(self, db_connection: sqlite3.Connection):
-        self._connection = db_connection
+    _connection: sqlite3.Connection
+    _logger: Logger
 
-    def find_homologable_subject_for(self, subject: OldPensumSubject) -> NewPensumSubject | None:
+    def __init__(self, db_connection: sqlite3.Connection, logger: Logger):
+        self._connection = db_connection
+        self._logger = logger
+
+    def find_old_subject_by_code(self, subject_code: int) -> OldPensumSubject | None:
+        query = """
+            SELECT code, name, credits, semester
+            FROM old_curriculum_subject
+            WHERE code = ?
+        """
+
+        self._connection.row_factory = sqlite3.Row
+        cursor = self._connection.cursor()
+        cursor.execute(query, (subject_code,))
+        row = cursor.fetchone()
+
+        if row is None:
+            self._logger.debug("old pensum subject %s not found", subject_code)
+            return None
+
+        return OldPensumSubject(
+            code=row["code"],
+            name=row["name"],
+            credits=row["credits"],
+            semester=row["semester"],
+        )
+
+    def find_new_subject_by_code(self, subject_code: int) -> NewPensumSubject | None:
+        query = """
+            SELECT code, name, credits, semester
+            FROM new_curriculum_subject
+            WHERE code = ?
+        """
+
+        self._connection.row_factory = sqlite3.Row
+        cursor = self._connection.cursor()
+        cursor.execute(query, (subject_code,))
+        row = cursor.fetchone()
+
+        if row is None:
+            self._logger.debug("new pensum subject %s not found", subject_code)
+            return None
+
+        return NewPensumSubject(
+            code=row["code"],
+            name=row["name"],
+            credits=row["credits"],
+            semester=row["semester"],
+        )
+
+    def find_homologable_subject_for(self, old_subject_code: int) -> NewPensumSubject | None:
         query = """
             SELECT
                 n.code,
@@ -22,7 +73,7 @@ class SQLiteSubjectRepository(SubjectRepository):
 
         self._connection.row_factory = sqlite3.Row
         cursor = self._connection.cursor()
-        cursor.execute(query, (subject.code,))
+        cursor.execute(query, (old_subject_code,))
         row = cursor.fetchone()
 
         if row is None:

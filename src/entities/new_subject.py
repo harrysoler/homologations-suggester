@@ -20,7 +20,7 @@ class NewPensumSubject:
         if not self.name or not self.name.strip():
             raise ValueError("name must be a non-empty string")
 
-        if not self.credits:
+        if self.credits is None:
             raise ValueError("credits must be a positive integer")
 
         if not (1 <= self.semester <= 10):

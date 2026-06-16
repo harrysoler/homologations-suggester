@@ -7,5 +7,6 @@ SubjectCode: TypeAlias = int
 SubjectName: TypeAlias = str
 SubjectCredits: TypeAlias = int
 
+StudentName: TypeAlias = str
 StudentIdentification: TypeAlias = int
 StudentGrades: TypeAlias = Mapping[SubjectCode, Grade]

@@ -6,7 +6,13 @@ from pathlib import Path
 from pypdf import PdfReader
 
 import utils
-from shared_types import Grade, StudentGrades, StudentIdentification, SubjectCode
+from shared_types import (
+    Grade,
+    StudentGrades,
+    StudentIdentification,
+    StudentName,
+    SubjectCode,
+)
 from student_info_gateway import StudentInfoGateway
 
 STUDENT_NAME_REGEX = r"Estudiante[\s\n]+Identificaci.+n:\s+\d+\s+(.+?)(?:Código:)"
@@ -31,7 +37,7 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         self._reader = PdfReader(pdf_path)
         self._text = " ".join(page.extract_text() for page in self._reader.pages)
 
-    def get_name(self) -> str:
+    def get_name(self) -> StudentName:
         match = re.search(STUDENT_NAME_REGEX, self._text)
 
         if match:

@@ -29,6 +29,8 @@ TARGET_SUBJECTS_TABLE_NAME_COL = 'K'
 TARGET_SUBJECTS_TABLE_CREDITS_COL = 'L'
 TARGET_SUBJECTS_TABLE_GRADE_COL = 'M'
 
+TOTAL_CREDITS = 129
+
 class HomologationXLSXFillService:
     def __init__(self, template_path: str):
         self.template_path = template_path
@@ -67,6 +69,7 @@ class HomologationXLSXFillService:
         ws['K37'] = CAREER
         ws['K39'] = TARGET_PENSUM
 
+        ws['M43'] = TOTAL_CREDITS
         ws['M45'] = student.get_total_approved_credits()
 
         self._fill_subjects(ws, student.approved_subjects)

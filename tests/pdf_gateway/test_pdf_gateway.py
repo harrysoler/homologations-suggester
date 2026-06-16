@@ -1,4 +1,5 @@
 import pytest
+import logging
 
 from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
 from shared_types import StudentGrades
@@ -78,8 +79,11 @@ def pdf_gateway(request):
     """Fixture that returns a PDFStudentInfoGateway and expected data tuple."""
     fixture_name = request.param
 
+    mock_logger = logging.getLogger("test")
+    mock_logger.handlers = []
+
     fixture = PDF_FIXTURES[fixture_name]
-    gateway = PDFStudentInfoGateway(fixture["path"])
+    gateway = PDFStudentInfoGateway(mock_logger, fixture["path"])
 
     return gateway, fixture
 

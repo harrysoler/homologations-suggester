@@ -1,30 +1,45 @@
 import re
-from pathlib import Path
-from pypdf import PdfReader
 from collections.abc import Callable
+from logging import Logger
+from pathlib import Path
+
+from pypdf import PdfReader
 
 import utils
-from shared_types import StudentIdentification, StudentGrades, SubjectCode, Grade
+from shared_types import Grade, StudentGrades, StudentIdentification, SubjectCode
 from student_info_gateway import StudentInfoGateway
 
 STUDENT_NAME_REGEX = r"Estudiante[\s\n]+Identificaci.+n:\s+\d+\s+(.+?)(?:Código:)"
 STUDENT_ID_REGEX = r"Identificaci.+n:\s+(\d+)"
+
+REGISTRATION_STATUS_VALUES = ["Matriculado", "Repite", "vez"]
 
 class PDFStudentInfoGateway(StudentInfoGateway):
     """
     Extracts students grades and core information from a Grades Historic PDF
     """
 
-    def __init__(self, pdf_path: str | Path):
-        self.pdf_path = Path(pdf_path)
-        self._reader = PdfReader(self.pdf_path)
+    _logger: Logger
+
+    def __init__(self, logger: Logger, pdf_path: str):
+        self._logger = logger
+
+        if Path(pdf_path).suffix != ".pdf":
+            raise ValueError(f"Unsupported file format: {pdf_path}")
+
+        self._logger.debug("opening pdf file: %s", pdf_path)
+        self._reader = PdfReader(pdf_path)
         self._text = " ".join(page.extract_text() for page in self._reader.pages)
 
     def get_name(self) -> str:
         match = re.search(STUDENT_NAME_REGEX, self._text)
 
         if match:
-            return match.group(1).strip()
+            student_name = match.group(1).strip()
+
+            self._logger.debug("found student name: %s", student_name)
+
+            return student_name
 
         raise ValueError("Could not extract student name from PDF")
 
@@ -44,7 +59,11 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         raw_subjects = self._split_lines_by_subject(cleaned_subject_lines)
 
         # when converted to dict the last grade with the same key (subject code) wins
-        return dict(map(self._extract_subject, raw_subjects))
+        subject_grades = dict(map(self._extract_subject, raw_subjects))
+
+        self._logger.debug("found subject grades: %s", subject_grades)
+
+        return subject_grades
 
     def _extract_subjects_tables_content(self, lines: list[str]) -> list[str]:
         table_prefixes = [index for index, item in enumerate(lines) if item in "Fall."]
@@ -116,14 +135,20 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         if '%' in raw_subject_parts[-3]:
             return float(raw_subject_parts[-2])
 
+        if '%' in raw_subject_parts[-4]:
+            return float(raw_subject_parts[-2])
+
         return None
 
     def _remove_unnecesary_parts_from_raw_subject(self, parts: list[str]) -> list[str] | None:
         # get index where the item is "Matriculado" or "Repite"
-        split_index = utils.search_index_by_any_match(["Matriculado","Repite"], parts)
+        split_index = utils.search_index_by_any_match(REGISTRATION_STATUS_VALUES, parts)
 
-        # return the parts after columns "H" and "C"
-        return parts[split_index + 3:] if split_index else None
+        # the parts after columns "H" and "C"
+        result = parts[split_index + 3:] if split_index else None
+
+        # in the unfortunate case the pdf page is splitted in a row
+        return utils.remove_last_str_items_until_digit_found(result)
 
     def _find_index_with_condition(self, condition: Callable[[str], bool], items: list[str]) -> int | None:
         return next(

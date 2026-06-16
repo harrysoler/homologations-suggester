@@ -1,4 +1,5 @@
-from itertools import dropwhile
+from operator import attrgetter
+from itertools import groupby
 
 def flatten(items: list[list[str]]) -> list[str]:
     return [item for sublist in items for item in sublist]
@@ -25,3 +26,8 @@ def remove_last_str_items_until_digit_found(items: list[str]) -> list[str]:
 
 def is_valid_float(input) -> bool:
     return input.replace('.', '').isdigit()
+
+def remove_duplicates_for_attribute(attribute: str, items):
+    items.sort(key=attrgetter(attribute))
+    
+    return [next(group) for _, group in groupby(items, key=attrgetter(attribute))]

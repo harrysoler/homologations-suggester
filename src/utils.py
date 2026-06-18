@@ -16,9 +16,9 @@ def search_index_by_any_match(matches: list[str] | str, items: list[str]) -> int
         None
     )
 
-def remove_last_str_items_until_digit_found(items: list[str]) -> list[str]:
+def remove_last_str_items_until_digit_or_empty_found(items: list[str]) -> list[str]:
     last_index_with_valid_digit = max(
-        (index for index, item in enumerate(items) if is_valid_float(item)),
+        (index for index, item in enumerate(items) if is_valid_float(item) or item == ""),
         default=-1
     )
 

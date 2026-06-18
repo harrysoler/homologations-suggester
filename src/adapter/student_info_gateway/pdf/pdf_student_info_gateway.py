@@ -58,15 +58,27 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         raise ValueError("Could not extract student identification from PDF")
 
     def get_graded_subjects(self) -> StudentGrades:
+
+        self._logger.debug("got raw text: %s", self._text)
+
         # split the text by breaklines and spaces
-        raw_lines = re.split(r"[\n ]+", self._text)
+        raw_lines = utils.flatten(text.split(' ') for text in self._text.split('\n'))
+
+        self._logger.debug("got raw lines: %s", raw_lines)
 
         raw_subject_lines = self._extract_subjects_tables_content(raw_lines)
 
-        cleaned_subject_lines = utils.flatten(list(map(utils.split_and_strip, raw_subject_lines)))
+        self._logger.debug("got raw subject lines: %s", raw_subject_lines)
+
+        # cleaned_subject_lines = utils.flatten(list(map(utils.split_and_strip, raw_subject_lines)))
+        cleaned_subject_lines = list(map(str.strip, raw_subject_lines))
+
+        self._logger.debug("got cleaned subject lines: %s", cleaned_subject_lines)
 
         raw_subjects = self._split_lines_by_subject(cleaned_subject_lines)
 
+        self._logger.debug("got raw subjects: %s", raw_subjects)
+        
         # when converted to dict the last grade with the same key (subject code) wins
         subject_grades = dict(map(self._extract_subject, raw_subjects))
 
@@ -75,8 +87,8 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         return subject_grades
 
     def _extract_subjects_tables_content(self, lines: list[str]) -> list[str]:
-        table_prefixes = [index for index, item in enumerate(lines) if item in "Fall."]
-        table_suffixes = [index for index, item in enumerate(lines) if "H:" in item]
+        table_prefixes = [index for index, item in enumerate(lines) if item == "Fall."]
+        table_suffixes = [index for index, item in enumerate(lines) if item == "H:"]
 
         table_content_ranges = list(zip(table_prefixes, table_suffixes))
 
@@ -136,6 +148,8 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         # remove subject code, credits, etc
         raw_subject_parts = self._remove_unnecesary_parts_from_raw_subject(parts)
 
+        self._logger.debug("extracting grade from: %s", raw_subject_parts)
+
         if not raw_subject_parts:
             return None
 
@@ -143,15 +157,12 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         if len(raw_subject_parts) == 1:
             return float(raw_subject_parts[0])
 
-        # locate where is the last percentage item and return final grade depending on that
-        if '%' in raw_subject_parts[-2]:
-            return float(raw_subject_parts[-1])
-
-        if '%' in raw_subject_parts[-3]:
+        #locate where is the final grade based on empty items in the list
+        if raw_subject_parts[-1] != "":
             return float(raw_subject_parts[-2])
 
-        if '%' in raw_subject_parts[-4]:
-            return float(raw_subject_parts[-2])
+        if raw_subject_parts[-2] == "":
+            return float(raw_subject_parts[-3])
 
         return None
 
@@ -166,7 +177,7 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         result = parts[split_index + 3:]
 
         # in the unfortunate case the pdf page is splitted in a row
-        result = utils.remove_last_str_items_until_digit_found(result)
+        result = utils.remove_last_str_items_until_digit_or_empty_found(result)
 
         return result
 

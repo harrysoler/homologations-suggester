@@ -25,7 +25,7 @@ class SuggestSubjectsService:
         passed_subjects = list(filter(None, passed_subjects))
 
         # homologated subjects cant repeat
-        return utils.remove_duplicates_for_attribute('target_subject.code', passed_subjects)
+        return utils.remove_duplicates_for_attribute('target_subject.code', passed_subjects, 'grade')
 
     def _find_homologable_subject(self, subject_data: tuple[SubjectCode, Grade]) -> ApprovedSubject:
         code, grade = subject_data

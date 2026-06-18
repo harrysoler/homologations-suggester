@@ -27,7 +27,8 @@ def remove_last_str_items_until_digit_found(items: list[str]) -> list[str]:
 def is_valid_float(input) -> bool:
     return input.replace('.', '').isdigit()
 
-def remove_duplicates_for_attribute(attribute: str, items):
-    items.sort(key=attrgetter(attribute))
+def remove_duplicates_for_attribute(attribute: str, items, sort_by_attrib: str | None = None):
+    if sort_by_attrib:
+        items.sort(key=attrgetter(sort_by_attrib))
     
     return [next(group) for _, group in groupby(items, key=attrgetter(attribute))]

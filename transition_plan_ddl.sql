@@ -70,6 +70,7 @@ insert into old_curriculum_subject (code, name, credits, semester) values
 (43002, 'ELECTRICIDAD Y MAGNETISMO', 3, 4),
 (96161, 'ELECTRICIDAD Y MAGNETISMO', 3, 4),
 (95110, 'EPISTEMOLOGIA', 2, 4),
+(10271, 'EPISTEMOLOGIA', 2, 5),
 (95129, 'INGLÉS IV', 2, 4),
 (95084, 'INGLÉS IV', 2, 4),
 (37604, 'ARQUITECTURA EMPRESARIAL', 3, 5),
@@ -105,7 +106,6 @@ insert into old_curriculum_subject (code, name, credits, semester) values
 (18689, 'LEGISLACION INFORMATICA', 2, 10),
 (96097, 'TRABAJO DE GRADO II', 7, 10),
 (96501, 'REDES / REDES I', 3, 5),
-(10271, 'EPISTEMOLOGIA', 2, 5),
 (34102, 'REQUERIMIENTOS Y DISEÑO DE SOFTWARE / DISEÑO DE SOFTWARE', 3, 4),
 (96601, 'REDES / REDES II', 3, 6),
 (20652, 'FISICA MECANICA', 3, 3),
@@ -248,6 +248,9 @@ insert into homologable(old_subject_code, new_subject_code) values
 (96097,30423), -- Trabajo de Grado II -> Opción de Grado
 (96098,30650), -- Ética -> Ética y Formación Ciudadana
 -- Duplicate old curriculum subjects (same name, different code)
+(96501,41116), -- Redes I -> Redes (dup)
+(96601,41116), -- Redes II -> Redes (dup)
+(95084,15653), -- Inglés IV -> Lengua Extranjera 4 (dub)
 (96161,96161), -- Electricidad y Magnetismo (dup)
 (96115,96115), -- Cálculo Vectorial (dup)
 (62337,30597), -- Antropología (dup) -> Persona Humana, Sociedad y Conocimiento

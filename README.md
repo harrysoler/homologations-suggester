@@ -1,16 +1,17 @@
+Esta aplicación CLI extrae información de historicos de notas, con lo cual hace la relación de materias homologables (con información de una base de datos SQLite). Finalmente el proceso llena un formato Excel de homologación con la información del estudiante.
+
 # Entrada
 
 El archivo PDF del historico de notas para extraer los siguientes datos:
 
 - Nombre
-- Semestre (nivel más bajo)
 - Documento de identidad
 - Número total de créditos homologados
 - Asignaturas aprobadas
 
 # Salida
 
-El resultado final para cada historico debe incluir los espacios del formato requerido:
+El resultado final es un formato Excel oficial llenado con:
 
 - Nombre del estudiante
 - Nivel de formación (semestre)
@@ -25,20 +26,22 @@ El resultado final para cada historico debe incluir los espacios del formato req
 - Plan de origen = "2018-2"
 - Plan de destino = "2026-2"
 - Número total de créditos homologados o reconocidos en el programa destino = suma de créditos homologados
+- Relación de materias homologadas del programa antiguo al nuevo
 
 # Entidades
 
-Espacio Homologado = ApprovedSubject
-  - Espacio de origen = OriginSubject
-  - Espacio de destino = DestinationSubject
+ApprovedSubject: Relación de materia homologada exitosamente
+  - OriginSubject
+  - DestinationSubject
+  - Nota
 
-  Atributos compartidos:
+NewPensumSubject & OldPensumSubject: Materias de pensum viejo y nuevo
   - Código = Code
   - Espacio Acádemico = Subject
   - Creditos = Credits
   - Nota = Grade
 
-# SQLite
+# Estructura SQLite
 
 Asignatura (viejo pensum):
   - Código tinyint (PK)
@@ -52,15 +55,10 @@ Asignatura (nuevo pensum):
   - Creditos tinyint
   - Semestre tinyint
 
-Prerequisito: Lista de condiciones en forma de asignaturas requeridas para ver la disponible correspondiente.
+Prerequisito: Lista de condiciones en forma de asignaturas requeridas para ver la siguiente
   - Codigo asignatura (FK asignatura)
   - Codigo asignatura prerequisito (FK asignatura)
 
-Homologable: Asignaturas homologables entre pensums
+Homologable: Relación de asignaturas homologables entre pensums
   - Codigo asignatura viejo pensum (FK asignatura)
   - Codigo asignatura nuevo pensum (FK asignatura)
-
-# Fases de ejecución
-
-2. Listar asignaturas homologables
-3. Filtrar prerequisitos

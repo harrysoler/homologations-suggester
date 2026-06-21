@@ -1,16 +1,17 @@
 import sqlite3
 from logging import Logger
+from pathlib import Path
 
+from entities import NewPensumSubject, OldPensumSubject
 from subject_repository import SubjectRepository
-from entities import OldPensumSubject, NewPensumSubject
 
 
 class SQLiteSubjectRepository(SubjectRepository):
     _connection: sqlite3.Connection
     _logger: Logger
 
-    def __init__(self, db_connection: sqlite3.Connection, logger: Logger):
-        self._connection = db_connection
+    def __init__(self, db_path: Path, logger: Logger):
+        self._connection = sqlite3.connect(db_path)
         self._logger = logger
 
     def find_old_subject_by_code(self, subject_code: int) -> OldPensumSubject | None:

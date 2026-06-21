@@ -1,60 +1,62 @@
 import logging
 import sqlite3
-import os
 from pathlib import Path
 
+import click
 from rich.logging import RichHandler
 
-from adapter.subject_repository.sqlite import SQLiteSubjectRepository
 from adapter.homologation_xlsx_fill import HomologationXLSXFillService
-from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
-from basic_student_info_service import BasicStudentInfoService
-from suggest_subject_service import SuggestSubjectsService
-
-from entities import Student
+from adapter.subject_repository.sqlite import SQLiteSubjectRepository
+from cli_adapter import CLIAdapter
 
 LOGGING_FORMAT = "%(message)s"
 
-PDF_PATH = "/media/data/teach/intersemestral_2026/plan_de_transicion/historicos_tercer_semestre/MUÑOZ ORTIZ BRAYAN LEONARDO.pdf"
-PATH_PREFIX = "/media/data/teach/intersemestral_2026/plan_de_transicion/historicos_tercer_semestre"
+DEFAULT_TEMPLATE_PATH = "template.xlsx"
+DEFAULT_DATABASE_PATH = "transition_plan.db"
 
-def main():
+def setup_subject_repository(db_path: str, logger: logging.Logger) -> sqlite3.Connection:
+    try:
+        return SQLiteSubjectRepository(Path(db_path), logger)
+    except sqlite3.OperationalError as error:
+        raise click.ClickException(f"Error creating SQLite repository: {error}")
+
+def setup_logger(verbose: bool) -> logging.Logger:
+    log_file = Path(__file__).resolve().parent.parent / "debug.log"
+
+    file_handler = logging.FileHandler(log_file, mode="w")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(LOGGING_FORMAT, datefmt="[%X]"))
+
+    console_handler = RichHandler()
+    console_handler.setLevel(logging.DEBUG)
+
     logging.basicConfig(
-        level="INFO",
+        level="DEBUG" if verbose else "INFO",
         format=LOGGING_FORMAT,
         datefmt="[%X]",
-        handlers=[RichHandler()]
+        handlers=[file_handler, console_handler]
     )
 
-    logger = logging.getLogger("rich")
+    return logging.getLogger("rich")
 
-    for filename in os.listdir(PATH_PREFIX):
-        full_path = os.path.join(PATH_PREFIX, filename)
+@click.command()
+@click.argument("pdf_path", type=click.Path(exists=True))
+@click.option("--template", "-t", type=click.Path(exists=True, dir_okay=False), default=DEFAULT_TEMPLATE_PATH, help="Path to the XLSX template file.")
+@click.option("--database", "-db", type=click.Path(exists=True, dir_okay=False), default=DEFAULT_DATABASE_PATH, help="Path to the SQLite subjects database.")
+@click.option("--verbose", "-v", is_flag=True, help="Enable DEBUG logging level.")
+def main(pdf_path: str, template: str, database: str, verbose: bool):
+    logger = setup_logger(verbose)
+    subject_repository = setup_subject_repository(DEFAULT_DATABASE_PATH, logger)
+    xlsx_fill_service = HomologationXLSXFillService(template)
 
-        if not os.path.isfile(full_path):
-            continue
+    cli_adapter = CLIAdapter(
+        subject_repository,
+        xlsx_fill_service,
+        logger
+    )
 
-        if Path(full_path).suffix != ".pdf":
-            continue
-
-        student_info_gateway = PDFStudentInfoGateway(logger, full_path)
-
-        conn = sqlite3.connect("transition_plan.db")
-        subject_repository = SQLiteSubjectRepository(conn, logger)
-
-        basic_info_service = BasicStudentInfoService(student_info_gateway)
-
-        suggest_subjects_service = SuggestSubjectsService(subject_repository, student_info_gateway, logger)
-
-        student = Student(
-            basic_info_service.get_student_name(),
-            basic_info_service.get_student_identification(),
-            suggest_subjects_service.suggest_homologable_subjects()
-        )
-
-        xlsx_fill_service = HomologationXLSXFillService("/media/data/teach/intersemestral_2026/plan_de_transicion/cli_subjects_suggester/src/adapter/homologation_xlsx_fill/template.xlsx")
-
-        xlsx_fill_service.fill(student)
+    cli_adapter.process_path(pdf_path)
 
 if __name__ == "__main__":
     main()
+

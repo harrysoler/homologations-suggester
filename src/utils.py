@@ -1,5 +1,6 @@
 from operator import attrgetter
 from itertools import groupby
+from pathlib import Path
 
 def flatten(items: list[list[str]]) -> list[str]:
     return [item for sublist in items for item in sublist]
@@ -32,3 +33,24 @@ def remove_duplicates_for_attribute(attribute: str, items, sort_by_attrib: str |
         items.sort(key=attrgetter(sort_by_attrib))
     
     return [next(group) for _, group in groupby(items, key=attrgetter(attribute))]
+
+def is_path_of_format(path: Path, format_suffix_without_dot: str) -> bool:
+    return path.suffix.lower() == f".{format_suffix_without_dot}"
+
+def folder_path_to_files(folder: Path, format_suffix_without_dot: str) -> list[Path]:
+    return list(folder.glob(f"*.{format_suffix_without_dot}"))
+
+def resolve_path(path: str, format_suffix_without_dot: str) -> Path | list[Path]:
+    """
+    Translates a string into a path or list of paths
+    """
+    resolved_path = Path(path)
+
+    if resolved_path.is_file():
+        if not is_path_of_format(resolved_path, format_suffix_without_dot):
+            raise ValueError(f"File must be {format_suffix_without_dot} format")
+
+        return resolved_path
+
+    elif resolved_path.is_dir():
+        return folder_path_to_files(resolved_path, format_suffix_without_dot)

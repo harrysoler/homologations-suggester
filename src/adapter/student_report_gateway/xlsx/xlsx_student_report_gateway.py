@@ -3,7 +3,8 @@ from datetime import date
 
 from openpyxl import load_workbook
 
-from entities import Student, ApprovedSubject
+from entities import ApprovedSubject, Student
+from student_report_gateway import StudentReportGateway
 
 DEFAULT_FORMATION_LEVEL = "Pregrado"
 DEFAULT_IDENTIFICATION_TYPE = "Cédula de Ciudadania"
@@ -31,20 +32,22 @@ TARGET_SUBJECTS_TABLE_GRADE_COL = 'M'
 
 TOTAL_CREDITS = 129
 
-class HomologationXLSXFillService:
+class XLSXStudentReportGateway(StudentReportGateway):
+    # TODO: Change template path type to Path
+    _template_path: str
+
     def __init__(self, template_path: str):
-        self.template_path = template_path
+        self._template_path = template_path
 
     @staticmethod
     def _build_filename(student_name: str) -> str:
         safe_name = student_name.lower().replace(' ', '_')
         return f'{safe_name}.xlsx'
 
-    def fill(self, student: Student, output_path: str | None = None) -> str:
-        if output_path is None:
-            output_path = self._build_filename(student.name)
+    def generate_report(self, student: Student) -> str:
+        output_path = self._build_filename(student.name)
 
-        shutil.copy2(self.template_path, output_path)
+        shutil.copy2(self._template_path, output_path)
 
         wb = load_workbook(output_path)
         ws = wb.active

@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 
 import utils
-from adapter.homologation_xlsx_fill import HomologationXLSXFillService
+from adapter.student_report_gateway.xlsx import XLSXStudentReportGateway
 from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
 from basic_student_info_service import BasicStudentInfoService
 from entities import Student
@@ -15,13 +15,14 @@ from homologable_subjects_service import HomologableSubjectsService
 
 class CLIAdapter:
     _subject_repository: SubjectRepository
-    _xlsx_fill_service: HomologationXLSXFillService
     _logger: logging.Logger
+    # TODO: change template_path type to Path
+    _template_path: str
 
-    def __init__(self, subject_repository: SubjectRepository, xlsx_fill_service: HomologationXLSXFillService, logger: logging.Logger):
+    def __init__(self, subject_repository: SubjectRepository, template_path: str, logger: logging.Logger):
         self._subject_repository = subject_repository
-        self._xlsx_fill_service = xlsx_fill_service
         self._logger = logger
+        self._template_path = template_path
 
     def process_path(self, path: str):
         resolved_path = self._setup_path(path)
@@ -44,7 +45,7 @@ class CLIAdapter:
 
         student = self._build_student_from(student_info_gateway)
 
-        self._xlsx_fill_service.fill(student)
+        XLSXStudentReportGateway(self._template_path).generate_report(student)
 
     def _build_student_from(self, student_info_gateway: StudentInfoGateway) -> Student:
         basic_info_service = BasicStudentInfoService(student_info_gateway)

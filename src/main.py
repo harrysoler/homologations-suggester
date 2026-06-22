@@ -5,7 +5,6 @@ from pathlib import Path
 import click
 from rich.logging import RichHandler
 
-from adapter.homologation_xlsx_fill import HomologationXLSXFillService
 from adapter.subject_repository.sqlite import SQLiteSubjectRepository
 from cli_adapter import CLIAdapter
 
@@ -47,11 +46,10 @@ def setup_logger(verbose: bool) -> logging.Logger:
 def main(pdf_path: str, template: str, database: str, verbose: bool):
     logger = setup_logger(verbose)
     subject_repository = setup_subject_repository(DEFAULT_DATABASE_PATH, logger)
-    xlsx_fill_service = HomologationXLSXFillService(template)
 
     cli_adapter = CLIAdapter(
         subject_repository,
-        xlsx_fill_service,
+        template,
         logger
     )
 

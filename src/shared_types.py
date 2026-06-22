@@ -10,3 +10,5 @@ SubjectCredits: TypeAlias = int
 StudentName: TypeAlias = str
 StudentIdentification: TypeAlias = int
 StudentGrades: TypeAlias = Mapping[SubjectCode, Grade]
+
+ReportGenerationResult: TypeAlias = str

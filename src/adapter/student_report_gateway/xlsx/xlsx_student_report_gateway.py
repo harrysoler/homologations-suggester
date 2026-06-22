@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 
 from entities import ApprovedSubject, Student
 from student_report_gateway import StudentReportGateway
+from shared_types import ReportGenerationResult
 
 DEFAULT_FORMATION_LEVEL = "Pregrado"
 DEFAULT_IDENTIFICATION_TYPE = "Cédula de Ciudadania"
@@ -40,7 +41,7 @@ class XLSXStudentReportGateway(StudentReportGateway):
         self._template_path = template_path
 
     @staticmethod
-    def _build_filename(student_name: str) -> str:
+    def _build_filename(student_name: str) -> ReportGenerationResult:
         safe_name = student_name.lower().replace(' ', '_')
         return f'{safe_name}.xlsx'
 

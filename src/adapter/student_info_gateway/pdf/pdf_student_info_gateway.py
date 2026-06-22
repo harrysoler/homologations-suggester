@@ -62,11 +62,20 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         self._logger.debug("got raw text: %s", self._text)
 
         # split the text by breaklines and spaces
-        raw_lines = utils.flatten(text.split(' ') for text in self._text.split('\n'))
+        raw_words = utils.flatten(text.split(' ') for text in self._text.split('\n'))
+        self._logger.debug("got raw words: %s", input)
 
-        self._logger.debug("got raw lines: %s", raw_lines)
+        raw_subjects = self._separate_words_by_subject(raw_words)
+        self._logger.debug("got raw subjects: %s", raw_subjects)
+        
+        # when converted to dict the last grade with the same key (subject code) wins
+        subject_grades = dict(map(self._extract_subject, raw_subjects))
+        self._logger.debug("found subject grades: %s", subject_grades)
 
-        raw_subject_lines = self._extract_subjects_tables_content(raw_lines)
+        return subject_grades
+
+    def _separate_words_by_subject(self, input: list[str]) -> list[list[str]]:
+        raw_subject_lines = self._extract_subjects_tables_content(input)
 
         self._logger.debug("got raw subject lines: %s", raw_subject_lines)
 
@@ -75,17 +84,8 @@ class PDFStudentInfoGateway(StudentInfoGateway):
 
         self._logger.debug("got cleaned subject lines: %s", cleaned_subject_lines)
 
-        raw_subjects = self._split_lines_by_subject(cleaned_subject_lines)
-
-        self._logger.debug("got raw subjects: %s", raw_subjects)
-        
-        # when converted to dict the last grade with the same key (subject code) wins
-        subject_grades = dict(map(self._extract_subject, raw_subjects))
-
-        self._logger.debug("found subject grades: %s", subject_grades)
-
-        return subject_grades
-
+        return self._split_lines_by_subject(cleaned_subject_lines)
+         
     def _extract_subjects_tables_content(self, lines: list[str]) -> list[str]:
         table_prefixes = [index for index, item in enumerate(lines) if item == "Fall."]
         table_suffixes = [index for index, item in enumerate(lines) if item == "H:"]

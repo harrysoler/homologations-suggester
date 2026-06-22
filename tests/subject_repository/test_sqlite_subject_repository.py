@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import tempfile
 from unittest.mock import MagicMock
 import pytest
 
@@ -13,7 +14,10 @@ DDL_PATH = os.path.join(BASE_DIR, "transition_plan_ddl.sql")
 
 
 def _create_test_db():
-    conn = sqlite3.connect(":memory:")
+    tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    tmp.close()
+
+    conn = sqlite3.connect(tmp.name)
     conn.execute("PRAGMA foreign_keys = OFF")
 
     with open(DDL_PATH, "r") as f:
@@ -21,16 +25,17 @@ def _create_test_db():
     conn.executescript(ddl_sql)
 
     conn.commit()
-    return conn
+    conn.close()
+    return tmp.name
 
 
 @pytest.fixture()
 def repository():
-    conn = _create_test_db()
+    db_path = _create_test_db()
     logger = MagicMock()
-    repo = SQLiteSubjectRepository(conn, logger)
+    repo = SQLiteSubjectRepository(db_path, logger)
     yield repo
-    conn.close()
+    os.unlink(db_path)
 
 
 @pytest.fixture()

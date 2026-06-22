@@ -8,12 +8,12 @@ from subject_repository import SubjectRepository
 from entities import ApprovedSubject, OldPensumSubject, NewPensumSubject
 
 @dataclass(frozen=True)
-class SuggestSubjectsService:
+class HomologableSubjectsService:
     _subject_repository: SubjectRepository
     _student_info_gateway: StudentInfoGateway
     _logger: Logger
 
-    def suggest_homologable_subjects(self) -> list[ApprovedSubject]:
+    def suggest_subjects(self) -> list[ApprovedSubject]:
         student_grades: StudentGrades = self._student_info_gateway.get_graded_subjects()
 
         passed_subject_grades = self._filter_approved_subjects(student_grades)

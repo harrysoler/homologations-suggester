@@ -10,7 +10,7 @@ from basic_student_info_service import BasicStudentInfoService
 from entities import Student
 from student_info_gateway import StudentInfoGateway
 from subject_repository import SubjectRepository
-from suggest_subject_service import SuggestSubjectsService
+from homologable_subjects_service import HomologableSubjectsService
 
 
 class CLIAdapter:
@@ -49,7 +49,7 @@ class CLIAdapter:
     def _build_student_from(self, student_info_gateway: StudentInfoGateway) -> Student:
         basic_info_service = BasicStudentInfoService(student_info_gateway)
 
-        suggest_subjects_service = SuggestSubjectsService(
+        suggest_subjects_service = HomologableSubjectsService(
             self._subject_repository,
             student_info_gateway,
             self._logger
@@ -58,5 +58,5 @@ class CLIAdapter:
         return Student(
             basic_info_service.get_student_name(),
             basic_info_service.get_student_identification(),
-            suggest_subjects_service.suggest_homologable_subjects()
+            suggest_subjects_service.suggest_subjects()
         )

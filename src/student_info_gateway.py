@@ -14,6 +14,3 @@ class StudentInfoGateway(Protocol):
 
     def get_graded_subjects(self) -> StudentGrades:
         ...
-
-    
-

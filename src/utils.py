@@ -40,9 +40,9 @@ def is_path_of_format(path: Path, format_suffix_without_dot: str) -> bool:
 def folder_path_to_files(folder: Path, format_suffix_without_dot: str) -> list[Path]:
     return list(folder.glob(f"*.{format_suffix_without_dot}"))
 
-def resolve_path(path: str, format_suffix_without_dot: str) -> Path | list[Path]:
+def resolve_path(path: str, format_suffix_without_dot: str) -> list[Path]:
     """
-    Translates a string into a path or list of paths
+    Translates a string into a list of paths
     """
     resolved_path = Path(path)
 
@@ -50,7 +50,7 @@ def resolve_path(path: str, format_suffix_without_dot: str) -> Path | list[Path]
         if not is_path_of_format(resolved_path, format_suffix_without_dot):
             raise ValueError(f"File must be {format_suffix_without_dot} format")
 
-        return resolved_path
+        return [resolved_path]
 
     elif resolved_path.is_dir():
         return folder_path_to_files(resolved_path, format_suffix_without_dot)

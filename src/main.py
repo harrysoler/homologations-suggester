@@ -5,8 +5,13 @@ from pathlib import Path
 import click
 from rich.logging import RichHandler
 
+import utils
+from adapter.student_report_gateway.xlsx import XLSXStudentReportGateway
 from adapter.subject_repository.sqlite import SQLiteSubjectRepository
-from cli_adapter import CLIAdapter
+from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
+from student_report_service import StudentReportService
+from student_report_gateway import StudentReportGateway
+from subject_repository import SubjectRepository
 
 LOGGING_FORMAT = "%(message)s"
 
@@ -38,6 +43,19 @@ def setup_logger(verbose: bool) -> logging.Logger:
 
     return logging.getLogger("rich")
 
+def process_files(subject_repository: SubjectRepository, report_gateway: StudentReportGateway, files: list[Path], logger: logging.Logger):
+    for file in files:
+        info_gateway = PDFStudentInfoGateway(logger, file)
+
+        report_result = StudentReportService(
+            info_gateway,
+            report_gateway,
+            subject_repository,
+            logger
+        ).generate_report()
+
+        logger.info(f"report generated at {report_result}")
+
 @click.command()
 @click.argument("pdf_path", type=click.Path(exists=True))
 @click.option("--template", "-t", type=click.Path(exists=True, dir_okay=False), default=DEFAULT_TEMPLATE_PATH, help="Path to the XLSX template file.")
@@ -45,15 +63,18 @@ def setup_logger(verbose: bool) -> logging.Logger:
 @click.option("--verbose", "-v", is_flag=True, help="Enable DEBUG logging level.")
 def main(pdf_path: str, template: str, database: str, verbose: bool):
     logger = setup_logger(verbose)
+
+    files_extracted_from_path = utils.resolve_path(pdf_path, "pdf")
+
     subject_repository = setup_subject_repository(DEFAULT_DATABASE_PATH, logger)
+    report_gateway = XLSXStudentReportGateway(template)
 
-    cli_adapter = CLIAdapter(
+    process_files(
         subject_repository,
-        template,
-        logger
+        report_gateway,
+        files_extracted_from_path,
+        logger,
     )
-
-    cli_adapter.process_path(pdf_path)
 
 if __name__ == "__main__":
     main()

@@ -62,3 +62,7 @@ Prerequisito: Lista de condiciones en forma de asignaturas requeridas para ver l
 Homologable: Relación de asignaturas homologables entre pensums
   - Codigo asignatura viejo pensum (FK asignatura)
   - Codigo asignatura nuevo pensum (FK asignatura)
+
+# Arquitectura
+
+![Application architecture](assets/architecture.png)

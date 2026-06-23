@@ -33,7 +33,7 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         if Path(pdf_path).suffix != ".pdf":
             raise ValueError(f"Unsupported file format: {pdf_path}")
 
-        self._logger.info("opening pdf file: %s", pdf_path)
+        self._logger.debug("opening pdf file: %s", pdf_path)
         self._reader = PdfReader(pdf_path)
         self._text = " ".join(page.extract_text() for page in self._reader.pages)
 

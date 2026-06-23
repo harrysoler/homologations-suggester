@@ -1,4 +1,7 @@
-Esta aplicación CLI extrae información de historicos de notas, con lo cual hace la relación de materias homologables (con información de una base de datos SQLite). Finalmente el proceso llena un formato Excel de homologación con la información del estudiante.
+Esta aplicación CLI extrae información de historicos de notas, con la cual es posible realizar:
+
+- La relación de materias homologables (con información de una base de datos SQLite), donde llena un formato Excel de homologación con la información del estudiante.
+- (EN PROGRESO) Mostrar un listado de materias faltantes o por ver priorizadas por semestre y materias de línea.
 
 # Entrada
 

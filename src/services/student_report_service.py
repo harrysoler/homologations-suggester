@@ -2,22 +2,17 @@ import logging
 from dataclasses import dataclass
 
 from entities import Student
-from gateways import StudentInfoGateway, StudentReportGateway
+from gateways import StudentReportGateway
 from services import HomologableSubjectsService
 from shared_types import ReportGenerationResult
-from subject_repository import SubjectRepository
 
 
 @dataclass(frozen=True)
 class StudentReportService:
-    _info_gateway: StudentInfoGateway
     _report_gateway: StudentReportGateway
-    _subject_repository: SubjectRepository
     _logger: logging.Logger
 
-    def generate_report(self) -> ReportGenerationResult:
-        student = self._build_student()
-
+    def generate_report(self, student: Student) -> ReportGenerationResult:
         return self._report_gateway.generate_report(student)
 
     def _build_student(self) -> Student:

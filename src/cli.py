@@ -6,12 +6,13 @@ import click
 from rich.logging import RichHandler
 
 import utils
+from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
 from adapter.student_report_gateway.xlsx import XLSXStudentReportGateway
 from adapter.subject_repository.sqlite import SQLiteSubjectRepository
-from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
-from subject_repository import SubjectRepository
+from entities import Student
 from gateways import StudentReportGateway
-from services import StudentReportService
+from services import HomologableSubjectsService, StudentReportService
+from subject_repository import SubjectRepository
 
 LOGGING_FORMAT = "%(message)s"
 
@@ -43,18 +44,39 @@ def setup_logger(verbose: bool) -> logging.Logger:
 
     return logging.getLogger("rich")
 
+def build_student_from_file(file: Path, subject_repository: SubjectRepository, logger: logging.Logger) -> Student:
+    logger.info("    parsing pdf text")
+
+    info_gateway = PDFStudentInfoGateway(logger, file)
+
+    logger.info("    obtaining homologable subjects")
+
+    homologable_subjects = HomologableSubjectsService(
+        subject_repository,
+        info_gateway,
+        logger
+    ).suggest_subjects()
+
+    return Student(
+        info_gateway.get_name(),
+        info_gateway.get_identification(),
+        homologable_subjects
+    )
+
 def process_files(subject_repository: SubjectRepository, report_gateway: StudentReportGateway, files: list[Path], logger: logging.Logger):
     for file in files:
-        info_gateway = PDFStudentInfoGateway(logger, file)
+        logger.info(f"processing file {file}")
+
+        student = build_student_from_file(file, subject_repository, logger)
+
+        logger.info("    generating report")
 
         report_result = StudentReportService(
-            info_gateway,
             report_gateway,
-            subject_repository,
             logger
-        ).generate_report()
+        ).generate_report(student)
 
-        logger.info(f"report generated at {report_result}")
+        logger.info(f"    report generated at {report_result}")
 
 @click.command()
 @click.argument("pdf_path", type=click.Path(exists=True))

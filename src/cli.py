@@ -9,9 +9,9 @@ import utils
 from adapter.student_report_gateway.xlsx import XLSXStudentReportGateway
 from adapter.subject_repository.sqlite import SQLiteSubjectRepository
 from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
-from student_report_service import StudentReportService
-from student_report_gateway import StudentReportGateway
 from subject_repository import SubjectRepository
+from gateways import StudentReportGateway
+from services import StudentReportService
 
 LOGGING_FORMAT = "%(message)s"
 

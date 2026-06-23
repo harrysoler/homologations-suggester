@@ -4,7 +4,7 @@ from datetime import date
 from openpyxl import load_workbook
 
 from entities import ApprovedSubject, Student
-from student_report_gateway import StudentReportGateway
+from gateways import StudentReportGateway
 from shared_types import ReportGenerationResult
 
 DEFAULT_FORMATION_LEVEL = "Pregrado"

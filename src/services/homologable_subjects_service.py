@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from logging import Logger
 
 import utils
-from student_info_gateway import StudentInfoGateway
-from shared_types import StudentGrades, SubjectCode, Grade
+from entities import ApprovedSubject, NewPensumSubject, OldPensumSubject
+from gateways import StudentInfoGateway
+from shared_types import Grade, StudentGrades, SubjectCode
 from subject_repository import SubjectRepository
-from entities import ApprovedSubject, OldPensumSubject, NewPensumSubject
+
 
 @dataclass(frozen=True)
 class HomologableSubjectsService:

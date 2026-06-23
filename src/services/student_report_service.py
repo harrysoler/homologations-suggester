@@ -1,12 +1,12 @@
 import logging
 from dataclasses import dataclass
 
-from homologable_subjects_service import HomologableSubjectsService
-from student_info_gateway import StudentInfoGateway
-from student_report_gateway import StudentReportGateway
-from subject_repository import SubjectRepository
-from shared_types import ReportGenerationResult
 from entities import Student
+from gateways import StudentInfoGateway, StudentReportGateway
+from services import HomologableSubjectsService
+from shared_types import ReportGenerationResult
+from subject_repository import SubjectRepository
+
 
 @dataclass(frozen=True)
 class StudentReportService:

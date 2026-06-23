@@ -6,6 +6,7 @@ from pathlib import Path
 from pypdf import PdfReader
 
 import utils
+from gateways import StudentInfoGateway
 from shared_types import (
     Grade,
     StudentGrades,
@@ -13,7 +14,6 @@ from shared_types import (
     StudentName,
     SubjectCode,
 )
-from student_info_gateway import StudentInfoGateway
 
 STUDENT_NAME_REGEX = r"Estudiante[\s\n]+Identificaci.+n:\s+\d+\s+(.+?)(?:Código:)"
 STUDENT_ID_REGEX = r"Identificaci.+n:\s+(\d+)"

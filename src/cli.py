@@ -3,7 +3,6 @@ import sqlite3
 from pathlib import Path
 
 import click
-from rich.console import Console
 
 import utils
 from adapter.cli.files_processor import CLIFilesProcessor

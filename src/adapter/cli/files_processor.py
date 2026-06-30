@@ -8,7 +8,7 @@ from gateways import StudentReportGateway
 from services import HomologableSubjectsService, StudentReportService
 from subject_repository import SubjectRepository
 
-from .progress_bar import CLIProgressBar
+from .reports_status import CLIReportsStatus
 
 
 @dataclass(frozen=True)
@@ -18,18 +18,15 @@ class CLIFilesProcessor:
     _logger: logging.Logger
 
     def process_files(self, files: list[Path]):
-        for file in files:
-            progress = CLIProgressBar(file)
+        status = CLIReportsStatus(len(files))
 
-            progress.advance("Processing file")
+        for file in files:
 
             self._logger.info(f"processing file {file}")
 
-            student = self._build_student_from(file, progress)
+            student = self._build_student_from(file)
 
             self._logger.info("    generating report")
-
-            progress.advance("Generating report")
 
             report_result = StudentReportService(
                 self._report_gateway,
@@ -38,16 +35,14 @@ class CLIFilesProcessor:
 
             self._logger.info(f"    report generated at {report_result}")
 
-            progress.advance("Report generated")
+            status.add_finished_report(student.name, report_result)
 
-            progress.end()
+        status.stop()
 
-    def _build_student_from(self, file: Path, progress: CLIProgressBar) -> Student:
+    def _build_student_from(self, file: Path) -> Student:
         self._logger.info("    parsing pdf text")
 
         info_gateway = PDFStudentInfoGateway(self._logger, file)
-
-        progress.advance("Obtaining homologable subjects")
 
         self._logger.info("    obtaining homologable subjects")
 
@@ -56,8 +51,6 @@ class CLIFilesProcessor:
             info_gateway,
             self._logger
         ).suggest_subjects()
-
-        progress.advance("Building student data")
 
         return Student(
             info_gateway.get_name(),

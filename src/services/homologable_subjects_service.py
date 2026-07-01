@@ -3,7 +3,6 @@ from logging import Logger
 
 import utils
 from entities import ApprovedSubject, NewPensumSubject, OldPensumSubject
-from gateways import StudentInfoGateway
 from shared_types import Grade, StudentGrades, SubjectCode
 from subject_repository import SubjectRepository
 
@@ -11,13 +10,10 @@ from subject_repository import SubjectRepository
 @dataclass(frozen=True)
 class HomologableSubjectsService:
     _subject_repository: SubjectRepository
-    _student_info_gateway: StudentInfoGateway
     _logger: Logger
 
-    def suggest_subjects(self) -> list[ApprovedSubject]:
-        student_grades: StudentGrades = self._student_info_gateway.get_graded_subjects()
-
-        passed_subject_grades = self._filter_approved_subjects(student_grades)
+    def suggest_subjects(self, grades: StudentGrades) -> list[ApprovedSubject]:
+        passed_subject_grades = self._filter_approved_subjects(grades)
 
         # find metadata of old passed subjects
         passed_subjects = list(map(self._find_homologable_subject, passed_subject_grades.items()))

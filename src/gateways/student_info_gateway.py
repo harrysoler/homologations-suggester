@@ -1,16 +1,11 @@
 from typing import Protocol
+from pathlib import Path
 
-from shared_types import StudentIdentification, StudentGrades, StudentName
+from entities import Student
 
 class StudentInfoGateway(Protocol):
     """
-    Acts as a source of student information to work with
+    Extractor of student information
     """
-    def get_name(self) -> StudentName:
-        ...
-
-    def get_identification(self) -> StudentIdentification:
-        ...
-
-    def get_graded_subjects(self) -> StudentGrades:
+    def extract_student_from(self, path: Path) -> Student:
         ...

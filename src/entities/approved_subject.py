@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from entities import OldPensumSubject, NewPensumSubject
+from .new_subject import NewPensumSubject
+from .old_subject import OldPensumSubject
 from shared_types import Grade
 
 @dataclass(frozen=True)

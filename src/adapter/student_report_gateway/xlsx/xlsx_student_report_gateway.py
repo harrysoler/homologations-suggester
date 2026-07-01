@@ -3,7 +3,7 @@ from datetime import date
 
 from openpyxl import load_workbook
 
-from entities import ApprovedSubject, Student
+from entities import ApprovedSubject, StudentAnalysis
 from gateways import StudentReportGateway
 from shared_types import ReportGenerationResult
 
@@ -45,7 +45,7 @@ class XLSXStudentReportGateway(StudentReportGateway):
         safe_name = student_name.lower().replace(' ', '_')
         return f'{safe_name}.xlsx'
 
-    def generate_report(self, student: Student) -> str:
+    def generate_report(self, student: StudentAnalysis) -> str:
         output_path = self._build_filename(student.name)
 
         shutil.copy2(self._template_path, output_path)

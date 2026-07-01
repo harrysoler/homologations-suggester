@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from entities import Student
+from entities import Student, StudentAnalysis
 from gateways import StudentReportGateway
 from services import HomologableSubjectsService
 from shared_types import ReportGenerationResult
@@ -10,21 +10,25 @@ from shared_types import ReportGenerationResult
 @dataclass(frozen=True)
 class StudentReportService:
     _report_gateway: StudentReportGateway
+    _homologable_subjects_service: HomologableSubjectsService
     _logger: logging.Logger
 
-    def generate_report(self, student: Student) -> ReportGenerationResult:
-        return self._report_gateway.generate_report(student)
+    def generate_report_from(self, student: Student) -> ReportGenerationResult:
+        analysis = self._build_analysis(student)
 
-    def _build_student(self) -> Student:
-        homologable_subjects = HomologableSubjectsService(
-            self._subject_repository,
-            self._info_gateway,
-            self._logger
-        ).suggest_subjects()
+        return self._report_gateway.generate_report(analysis)
 
-        return Student(
-            self._info_gateway.get_name(),
-            self._info_gateway.get_identification(),
+    def _build_analysis(self, student: Student) -> StudentAnalysis:
+        homologable_subjects = (
+            self
+            ._homologable_subjects_service
+            .suggest_subjects(student.grades)
+        )
+
+        return StudentAnalysis(
+            student.name,
+            student.identification,
+            student.grades,
             homologable_subjects
         )
         

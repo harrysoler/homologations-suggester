@@ -1,17 +1,12 @@
-from dataclasses import dataclass
+from typing import NamedTuple
 
-from shared_types import StudentName, StudentIdentification
-from entities import ApprovedSubject
+from shared_types import StudentName, StudentIdentification, StudentGrades
 
-@dataclass(frozen=True)
-class Student:
+class Student(NamedTuple):
     """
-    All the information of the student grouped into one class
+    All the information of the student as input
     """
 
     name: StudentName
     identification: StudentIdentification
-    approved_subjects: list[ApprovedSubject]
-
-    def get_total_approved_credits(self) -> int:
-        return sum(item.target_subject.credits for item in self.approved_subjects) 
+    grades: StudentGrades

@@ -7,6 +7,7 @@ from pypdf import PdfReader
 
 import utils
 from gateways import StudentInfoGateway
+from entities import Student
 from shared_types import (
     Grade,
     StudentGrades,
@@ -27,18 +28,30 @@ class PDFStudentInfoGateway(StudentInfoGateway):
 
     _logger: Logger
 
-    def __init__(self, logger: Logger, pdf_path: str):
+    def __init__(self, logger: Logger):
         self._logger = logger
 
-        if Path(pdf_path).suffix != ".pdf":
-            raise ValueError(f"Unsupported file format: {pdf_path}")
+    def extract_student_from(self, path: Path) -> Student:
+        text = self._extract_text_from(path)
 
-        self._logger.debug("opening pdf file: %s", pdf_path)
-        self._reader = PdfReader(pdf_path)
-        self._text = " ".join(page.extract_text() for page in self._reader.pages)
+        return Student(
+            self._extract_name_from(text),
+            self._extract_identification_from(text),
+            self._extract_grades_from(text)
+        )
 
-    def get_name(self) -> StudentName:
-        match = re.search(STUDENT_NAME_REGEX, self._text)
+    def _extract_text_from(self, path: Path) -> str:
+        if Path(path).suffix != ".pdf":
+            raise ValueError(f"Unsupported file format: {path}")
+
+        self._logger.debug("opening pdf file: %s", path)
+        self._reader = PdfReader(path)
+
+        return " ".join(page.extract_text() for page in self._reader.pages)
+        
+
+    def _extract_name_from(self, text: str) -> StudentName:
+        match = re.search(STUDENT_NAME_REGEX, text)
 
         if match:
             student_name = match.group(1).strip()
@@ -49,20 +62,20 @@ class PDFStudentInfoGateway(StudentInfoGateway):
 
         raise ValueError("Could not extract student name from PDF")
 
-    def get_identification(self) -> StudentIdentification:
-        match = re.search(STUDENT_ID_REGEX, self._text)
+    def _extract_identification_from(self, text: str) -> StudentIdentification:
+        match = re.search(STUDENT_ID_REGEX, text)
 
         if match:
             return int(match.group(1))
 
         raise ValueError("Could not extract student identification from PDF")
 
-    def get_graded_subjects(self) -> StudentGrades:
+    def _extract_grades_from(self, text: str) -> StudentGrades:
 
-        self._logger.debug("got raw text: %s", self._text)
+        self._logger.debug("got raw text: %s", text)
 
         # split the text by breaklines and spaces
-        raw_words = utils.flatten(text.split(' ') for text in self._text.split('\n'))
+        raw_words = utils.flatten(text.split(' ') for text in text.split('\n'))
         self._logger.debug("got raw words: %s", input)
 
         raw_subjects = self._separate_words_by_subject(raw_words)

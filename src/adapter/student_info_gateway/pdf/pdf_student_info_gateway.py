@@ -106,7 +106,7 @@ class PDFStudentInfoGateway(StudentInfoGateway):
         table_content_ranges = list(zip(table_prefixes, table_suffixes))
 
         if not table_content_ranges:
-            return ValueError("Subjects table content not found")
+            raise ValueError("Subjects table content not found")
 
         return utils.flatten(list(map(
             lambda range: lines[range[0] + 1:range[1]],
@@ -139,13 +139,13 @@ class PDFStudentInfoGateway(StudentInfoGateway):
 
         if not subject_code:
             self._logger.debug("subject code not found")
-            return None
+            raise ValueError("Subject code not found")
 
         final_grade = self._extract_final_grade_from(parts)
 
         if final_grade is None:
             self._logger.debug("subject grade not found")
-            return None
+            raise ValueError(f"Grade not found for subject {subject_code}")
 
         result = (subject_code, final_grade)
 

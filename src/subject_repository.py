@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from entities import OldPensumSubject, NewPensumSubject
-from shared_types import SubjectCode
+from shared_types import SubjectCode, SubjectPrerequisite
 
 
 class SubjectRepository(Protocol):
@@ -17,5 +17,11 @@ class SubjectRepository(Protocol):
     def find_pending_subjects_from_new_pensum(approved_subjects: list[SubjectCode]) -> list[NewPensumSubject]:
         """
         Get all the subjects from the new pensum excluding the already approved
+        """
+        ...
+
+    def find_all_new_subject_prerequisites() -> list[SubjectPrerequisite]:
+        """
+        Get all the prerequisites in form of subject codes
         """
         ...

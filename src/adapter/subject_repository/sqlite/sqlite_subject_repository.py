@@ -4,7 +4,7 @@ from pathlib import Path
 
 from entities import NewPensumSubject, OldPensumSubject
 from subject_repository import SubjectRepository
-from shared_types import SubjectCode
+from shared_types import SubjectCode, SubjectPrerequisite
 
 
 class SQLiteSubjectRepository(SubjectRepository):
@@ -122,3 +122,16 @@ class SQLiteSubjectRepository(SubjectRepository):
             )
             for row in rows
         ]
+
+    def find_all_new_subject_prerequisites(self) -> list[SubjectPrerequisite]:
+        query = """
+            SELECT subject_code, prerequisite_subject_code
+            FROM prerequisite
+        """
+
+        self._connection.row_factory = sqlite3.Row
+        cursor = self._connection.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        return [{row["subject_code"]: row["prerequisite_subject_code"]} for row in rows]

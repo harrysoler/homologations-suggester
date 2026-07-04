@@ -6,6 +6,7 @@ Grade: TypeAlias = float
 SubjectCode: TypeAlias = int
 SubjectName: TypeAlias = str
 SubjectCredits: TypeAlias = int
+SubjectPrerequisite: TypeAlias = Mapping[SubjectCode, SubjectCode]
 
 StudentName: TypeAlias = str
 StudentIdentification: TypeAlias = int

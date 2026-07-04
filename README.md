@@ -1,71 +1,29 @@
-Esta aplicación CLI extrae información de historicos de notas, con la cual es posible realizar:
+Python CLI application for generation of reports based on student(s) grades historic in PDF, currently generates reports for:
 
-- La relación de materias homologables (con información de una base de datos SQLite), donde llena un formato Excel de homologación con la información del estudiante.
-- (EN PROGRESO) Mostrar un listado de materias faltantes o por ver priorizadas por semestre y materias de línea.
+- Homologation of subjects for a new pensum in XLSX format
+- Pending subjects in the career in TXT format
 
-# Entrada
+The old and new pensum subjects information is allocated in a file-based SQLite database `transition_plan.db` with the following structure:
 
-El archivo PDF del historico de notas para extraer los siguientes datos:
+![SQLite subjects database diagram](assets/db_diagram.png)
 
-- Nombre
-- Documento de identidad
-- Número total de créditos homologados
-- Asignaturas aprobadas
+# Student grades historic
 
-# Salida
+From the PDF file are extracted the following data:
 
-El resultado final es un formato Excel oficial llenado con:
+- Name
+- Identification
+- Subject codes with his respective grade
 
-- Nombre del estudiante
-- Nivel de formación (semestre)
-- Tipo de documento (no se puede extraer)
-- Documento de identidad
-- Tipo de homologación o reconocimiento de créditos = "Trancisión de plan de estudios"
-- Institución de educación superior de destino = "Universidad Santo Tomás"
-- Ciudad = "Tunja"
-- Pais = "Colombia"
-- Programa de origen = "Ingeniería de Sistemas"
-- Programa de destino = "Ingeniería de Sistemas"
-- Plan de origen = "2018-2"
-- Plan de destino = "2026-2"
-- Número total de créditos homologados o reconocidos en el programa destino = suma de créditos homologados
-- Relación de materias homologadas del programa antiguo al nuevo
+# XLSX Homologation report
 
-# Entidades
+The homologation format is filled with the following data:
 
-ApprovedSubject: Relación de materia homologada exitosamente
-  - OriginSubject
-  - DestinationSubject
-  - Nota
+- Name
+- Identification
+- Total number of credits approved
+- Subjects relation from the old pensum to the new one
 
-NewPensumSubject & OldPensumSubject: Materias de pensum viejo y nuevo
-  - Código = Code
-  - Espacio Acádemico = Subject
-  - Creditos = Credits
-  - Nota = Grade
-
-# Estructura SQLite
-
-Asignatura (viejo pensum):
-  - Código tinyint (PK)
-  - Nombre text
-  - Creditos tinyint
-  - Semestre tinyint
-
-Asignatura (nuevo pensum):
-  - Código tinyint (PK)
-  - Nombre text
-  - Creditos tinyint
-  - Semestre tinyint
-
-Prerequisito: Lista de condiciones en forma de asignaturas requeridas para ver la siguiente
-  - Codigo asignatura (FK asignatura)
-  - Codigo asignatura prerequisito (FK asignatura)
-
-Homologable: Relación de asignaturas homologables entre pensums
-  - Codigo asignatura viejo pensum (FK asignatura)
-  - Codigo asignatura nuevo pensum (FK asignatura)
-
-# Arquitectura
+# Architecture
 
 ![Application architecture](assets/architecture.png)

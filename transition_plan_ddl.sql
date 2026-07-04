@@ -180,6 +180,7 @@ insert into new_curriculum_subject (code, name, credits, semester, is_main) valu
 insert into prerequisite (subject_code, prerequisite_subject_code) values
 (96113, 11701), -- Cálculo Integral -> Cálculo Diferencial
 (96115, 96103), -- Cálculo Vectorial -> Álgebra Lineal
+(96115, 96113), -- Cálculo Vectorial -> Cálculo Integral
 (96112, 11701), -- Física Mecánica -> Cálculo Diferencial
 (96161, 96112), -- Electricidad y Magnetismo -> Física Mecánica
 (96117, 96113), -- Ecuaciones Diferenciales -> Cálculo Integral
@@ -197,7 +198,10 @@ insert into prerequisite (subject_code, prerequisite_subject_code) values
 (31163, 31162), -- Broker de Mensajería -> Microservicios
 (48004, 96300), -- Sistemas Operativos -> Arquitectura del Computador
 (41151, 96500), -- Bases de Datos NoSQL -> Bases de Datos
-(41131, 41158); -- Deep Learning -> Machine Learning
+(41131, 41158), -- Deep Learning -> Machine Learning
+(30673, 30672), -- Optativa II -> Optativa I
+(31165, 31164), -- Optativa de profundización II -> Optativa de profundización I
+(31167, 31165); -- Optativa de profundización III -> Optativa de profundización II
 
 insert into homologable(old_subject_code, new_subject_code) values
 (96110,11701), -- calculo diferencial

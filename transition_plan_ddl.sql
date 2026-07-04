@@ -14,7 +14,8 @@ create table new_curriculum_subject (
 	code                int primary key,
 	name                text not null,
 	credits             tinyint not null,
-	semester            tinyint not null
+	semester            tinyint not null,
+	is_main				boolean not null default false
 );
 
 create table prerequisite (
@@ -111,70 +112,70 @@ insert into old_curriculum_subject (code, name, credits, semester) values
 (20652, 'FISICA MECANICA', 3, 3),
 (98150, 'COMUNICACION ORAL Y ESCRITA', 2, 1);
 
-insert into new_curriculum_subject (code, name, credits, semester) values
+insert into new_curriculum_subject (code, name, credits, semester, is_main) values
 -- Semester 1
-(96103, 'ALGEBRA LINEAL', 2, 1),
-(11701, 'CALCULO DIFERENCIAL', 3, 1),
-(31161, 'DISEÑO WEB', 3, 1),
-(10240, 'FILOSOFIA INSTITUCIONAL', 2, 1),
-(41111, 'INTRODUCCION A LA INGENIERIA SISTEMAS', 3, 1),
-(15650, 'LENGUA EXTRANJERA I', 2, 1),
-(31160, 'PROGRAMACION ESTRUCTURADA PARA INGENIERÍAS', 2, 1),
+(96103, 'ALGEBRA LINEAL', 2, 1, false),
+(11701, 'CALCULO DIFERENCIAL', 3, 1, false),
+(31161, 'DISEÑO WEB', 3, 1, true),
+(10240, 'FILOSOFIA INSTITUCIONAL', 2, 1, false),
+(41111, 'INTRODUCCION A LA INGENIERIA SISTEMAS', 3, 1, true),
+(15650, 'LENGUA EXTRANJERA I', 2, 1, false),
+(31160, 'PROGRAMACION ESTRUCTURADA PARA INGENIERÍAS', 2, 1, true),
 
 -- Semester 2
-(96500, 'BASES DE DATOS', 3, 2),
-(96113, 'CALCULO INTEGRAL', 3, 2),
-(33126, 'CATEDRA OPCIONAL INSTITUCIONAL', 2, 2),
-(91504, 'ESTADISTICA Y PROBABILIDAD', 2, 2),
-(15651, 'LENGUA EXTRANJERA II', 2, 2),
-(30115, 'METODOS NUMERICOS', 2, 2),
-(96181, 'PROGRAMACION ORIENTADA A OBJETOS', 3, 2),
+(96500, 'BASES DE DATOS', 3, 2, true),
+(96113, 'CALCULO INTEGRAL', 3, 2, false),
+(33126, 'CATEDRA OPCIONAL INSTITUCIONAL', 2, 2, false),
+(91504, 'ESTADISTICA Y PROBABILIDAD', 2, 2, false),
+(15651, 'LENGUA EXTRANJERA II', 2, 2, false),
+(30115, 'METODOS NUMERICOS', 2, 2, false),
+(96181, 'PROGRAMACION ORIENTADA A OBJETOS', 3, 2, true),
 
 -- Semester 3
-(82355, 'ANALISIS NUMERICO', 2, 3),
-(41151, 'BASES DE DATOS NOSQL', 3, 3),
-(96115, 'CALCULO VECTORIAL', 3, 3),
-(40748, 'DESARROLLO EMPRESARIAL', 3, 3),
-(96112, 'FISICA MECANICA', 3, 3),
-(15652, 'LENGUA EXTRANJERA III', 2, 3),
-(30597, 'PERSONA HUMANA, SOCIEDAD Y CONOCIMIENTO', 2, 3),
+(82355, 'ANALISIS NUMERICO', 2, 3, false),
+(41151, 'BASES DE DATOS NOSQL', 3, 3, true),
+(96115, 'CALCULO VECTORIAL', 3, 3, false),
+(40748, 'DESARROLLO EMPRESARIAL', 3, 3, true),
+(96112, 'FISICA MECANICA', 3, 3, false),
+(15652, 'LENGUA EXTRANJERA III', 2, 3, false),
+(30597, 'PERSONA HUMANA, SOCIEDAD Y CONOCIMIENTO', 2, 3, false),
 
 -- Semester 4
-(41170, 'ANALÍTICA DE DATOS', 2, 4),
-(96117, 'ECUACIONES DIFERENCIALES', 2, 4),
-(30670, 'ELECTIVA', 2, 4),
-(96161, 'ELECTRICIDAD Y MAGNETISMO', 3, 4),
-(96400, 'ESTRUCTURA DE DATOS', 3, 4),
-(15653, 'LENGUA EXTRANJERA IV', 2, 4),
-(31162, 'MICROSERVICIOS', 3, 4),
+(41170, 'ANALÍTICA DE DATOS', 2, 4, true),
+(96117, 'ECUACIONES DIFERENCIALES', 2, 4, false),
+(30670, 'ELECTIVA', 2, 4, true),
+(96161, 'ELECTRICIDAD Y MAGNETISMO', 3, 4, false),
+(96400, 'ESTRUCTURAS DE DATOS', 3, 4, true),
+(15653, 'LENGUA EXTRANJERA IV', 2, 4, false),
+(31162, 'MICROSERVICIOS', 3, 4, true),
 
 -- Semester 5
-(96300, 'ARQUITECTURA DEL COMPUTADOR', 3, 5),
-(37604, 'ARQUITECTURA EMPRESARIAL', 3, 5),
-(31163, 'BROKER DE MENSAJERIA', 3, 5),
-(15654, 'LENGUA EXTRANJERA V', 2, 5),
-(41158, 'MACHINE LEARNING', 3, 5),
-(30672, 'OPTATIVA I', 3, 5),
+(96300, 'ARQUITECTURA DEL COMPUTADOR', 3, 5, true),
+(37604, 'ARQUITECTURA EMPRESARIAL', 3, 5, true),
+(31163, 'BROKER DE MENSAJERIA', 3, 5, true),
+(15654, 'LENGUA EXTRANJERA V', 2, 5, false),
+(41158, 'MACHINE LEARNING', 3, 5, true),
+(30672, 'OPTATIVA I', 3, 5, true),
 
 -- Semester 6
-(41150, 'BIG DATA', 2, 6),
-(62345, 'CULTURA TEOLOGICA Y HECHO RELIGIOSO', 2, 6),
-(96701, 'GERENCIA Y CALIDAD DE SOFTWARE', 3, 6),
-(31164, 'OPTATIVA DE PROFUNDIZACION 1', 3, 6),
-(96904, 'SIMULACION', 3, 6),
-(48004, 'SISTEMAS OPERATIVOS', 3, 6),
+(41150, 'BIG DATA', 2, 6, true),
+(62345, 'CULTURA TEOLOGICA Y HECHO RELIGIOSO', 2, 6, false),
+(96701, 'GERENCIA Y CALIDAD DE SOFTWARE', 3, 6, true),
+(31164, 'OPTATIVA DE PROFUNDIZACION 1', 3, 6, true),
+(96904, 'SIMULACION', 3, 6, true),
+(48004, 'SISTEMAS OPERATIVOS', 3, 6, true),
 
 -- Semester 7
-(37606, 'AUDITORIA DE SISTEMAS', 3, 7),
-(41131, 'DEEP LEARNING', 3, 7),
-(30650, 'ETICA Y FORMACIÓN CIUDADANA', 2, 7),
-(30673, 'OPTATIVA 2', 3, 7),
-(31165, 'OPTATIVA DE PROFUNDIZACION 2', 3, 7),
-(41116, 'REDES', 3, 7),
+(37606, 'AUDITORIA DE SISTEMAS', 3, 7, true),
+(41131, 'DEEP LEARNING', 3, 7, true),
+(30650, 'ETICA Y FORMACIÓN CIUDADANA', 2, 7, false),
+(30673, 'OPTATIVA 2', 3, 7, true),
+(31165, 'OPTATIVA DE PROFUNDIZACION 2', 3, 7, true),
+(41116, 'REDES', 3, 7, true),
 
 -- Semester 8
-(30423, 'OPCIÓN DE GRADO', 7, 8),
-(31167, 'OPTATIVA DE PROFUNDIZACION 3', 3, 8);
+(30423, 'OPCIÓN DE GRADO', 7, 8, true),
+(31167, 'OPTATIVA DE PROFUNDIZACION 3', 3, 8, true);
 
 insert into prerequisite (subject_code, prerequisite_subject_code) values
 (96113, 11701), -- Cálculo Integral -> Cálculo Diferencial

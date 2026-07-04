@@ -12,6 +12,7 @@ class NewPensumSubject:
     name: SubjectName
     credits: SubjectCredits
     semester: Semester
+    is_main: bool = False
 
     def __post_init__(self):
         if not self.code:

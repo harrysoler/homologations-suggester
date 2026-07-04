@@ -40,7 +40,7 @@ class SQLiteSubjectRepository(SubjectRepository):
 
     def find_new_subject_by_code(self, subject_code: int) -> NewPensumSubject | None:
         query = """
-            SELECT code, name, credits, semester
+            SELECT code, name, credits, semester, is_main
             FROM new_curriculum_subject
             WHERE code = ?
         """
@@ -59,6 +59,7 @@ class SQLiteSubjectRepository(SubjectRepository):
             name=row["name"],
             credits=row["credits"],
             semester=row["semester"],
+            is_main=bool(row["is_main"]),
         )
 
     def find_homologable_subject_for(self, old_subject_code: int) -> NewPensumSubject | None:
@@ -67,7 +68,8 @@ class SQLiteSubjectRepository(SubjectRepository):
                 n.code,
                 n.name,
                 n.credits,
-                n.semester
+                n.semester,
+                n.is_main
             FROM homologable h
             JOIN new_curriculum_subject n ON n.code = h.new_subject_code
             WHERE h.old_subject_code = ?
@@ -86,19 +88,20 @@ class SQLiteSubjectRepository(SubjectRepository):
             name=row["name"],
             credits=row["credits"],
             semester=row["semester"],
+            is_main=bool(row["is_main"]),
         )
 
     def find_pending_subjects_from_new_pensum(self, approved_subjects: list[SubjectCode]) -> list[NewPensumSubject]:
         if not approved_subjects:
             query = """
-                SELECT code, name, credits, semester
+                SELECT code, name, credits, semester, is_main
                 FROM new_curriculum_subject
             """
             params = ()
         else:
             placeholders = ",".join("?" for _ in approved_subjects)
             query = f"""
-                SELECT code, name, credits, semester
+                SELECT code, name, credits, semester, is_main
                 FROM new_curriculum_subject
                 WHERE code NOT IN ({placeholders})
             """
@@ -115,6 +118,7 @@ class SQLiteSubjectRepository(SubjectRepository):
                 name=row["name"],
                 credits=row["credits"],
                 semester=row["semester"],
+                is_main=bool(row["is_main"]),
             )
             for row in rows
         ]

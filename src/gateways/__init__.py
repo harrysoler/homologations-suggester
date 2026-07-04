@@ -1,4 +1,4 @@
 from .student_info_gateway import StudentInfoGateway
-from .student_report_gateway import StudentReportGateway
+from .homologation_report_gateway import HomologationReportGateway
 
-__all__ = ["StudentInfoGateway", "StudentReportGateway"]
+__all__ = ["StudentInfoGateway", "HomologationReportGateway"]

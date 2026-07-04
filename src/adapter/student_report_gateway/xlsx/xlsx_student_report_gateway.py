@@ -3,8 +3,8 @@ from datetime import date
 
 from openpyxl import load_workbook
 
-from entities import ApprovedSubject, StudentAnalysis
-from gateways import StudentReportGateway
+from entities import ApprovedSubject, HomologationReportData
+from gateways import HomologationReportGateway
 from shared_types import ReportGenerationResult
 
 DEFAULT_FORMATION_LEVEL = "Pregrado"
@@ -33,7 +33,7 @@ TARGET_SUBJECTS_TABLE_GRADE_COL = 'M'
 
 TOTAL_CREDITS = 129
 
-class XLSXStudentReportGateway(StudentReportGateway):
+class XLSXStudentReportGateway(HomologationReportGateway):
     # TODO: Change template path type to Path
     _template_path: str
 
@@ -45,7 +45,7 @@ class XLSXStudentReportGateway(StudentReportGateway):
         safe_name = student_name.lower().replace(' ', '_')
         return f'{safe_name}.xlsx'
 
-    def generate_report(self, student: StudentAnalysis) -> str:
+    def generate_report(self, student: HomologationReportData) -> str:
         output_path = self._build_filename(student.name)
 
         shutil.copy2(self._template_path, output_path)

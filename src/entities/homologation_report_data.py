@@ -4,9 +4,9 @@ from shared_types import StudentName, StudentIdentification, StudentGrades
 from entities import ApprovedSubject
 
 @dataclass(frozen=True)
-class StudentAnalysis:
+class HomologationReportData:
     """
-    All the information gathered from the student
+    Student homologation report details
     """
 
     name: StudentName

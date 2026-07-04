@@ -5,7 +5,7 @@ from typing import Annotated, TypeAlias
 import typer
 
 import utils
-from gateways import StudentInfoGateway, StudentReportGateway
+from gateways import StudentInfoGateway, HomologationReportGateway
 from services import HomologableSubjectsService, StudentReportService
 from subject_repository import SubjectRepository
 
@@ -20,7 +20,7 @@ DatabaseOption: TypeAlias = Annotated[Path, typer.Option(help="Path to the SQLit
 
 class TyperCLIHandler:
     _subject_repository: SubjectRepository
-    _report_gateway: StudentReportGateway
+    _report_gateway: HomologationReportGateway
     _info_gateway: StudentInfoGateway
     _logger: Logger
     _app: typer.Typer
@@ -28,7 +28,7 @@ class TyperCLIHandler:
     def __init__(
         self,
         subject_repository: type[SubjectRepository],
-        student_report_gateway: StudentReportGateway,
+        student_report_gateway: HomologationReportGateway,
         student_info_gateway: StudentInfoGateway,
         logger: Logger
     ):

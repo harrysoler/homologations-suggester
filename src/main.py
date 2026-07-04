@@ -1,8 +1,4 @@
 import logging
-import sqlite3
-from pathlib import Path
-
-import click
 
 from adapter.cli import TyperCLIHandler
 from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
@@ -20,13 +16,6 @@ def setup_logger() -> logging.Logger:
     logger.addHandler(file_handler)
 
     return logger
-
-def setup_subject_repository(db_path: str, logger: logging.Logger) -> sqlite3.Connection:
-    try:
-        return SQLiteSubjectRepository(Path(db_path), logger)
-    except sqlite3.OperationalError as error:
-        raise click.ClickException(f"Error creating SQLite repository: {error}")
-
 
 def main():
     logger = setup_logger()

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from entities import NewPensumSubject, OldPensumSubject
 from subject_repository import SubjectRepository
+from shared_types import SubjectCode
 
 
 class SQLiteSubjectRepository(SubjectRepository):
@@ -86,3 +87,34 @@ class SQLiteSubjectRepository(SubjectRepository):
             credits=row["credits"],
             semester=row["semester"],
         )
+
+    def find_pending_subjects_from_new_pensum(self, approved_subjects: list[SubjectCode]) -> list[NewPensumSubject]:
+        if not approved_subjects:
+            query = """
+                SELECT code, name, credits, semester
+                FROM new_curriculum_subject
+            """
+            params = ()
+        else:
+            placeholders = ",".join("?" for _ in approved_subjects)
+            query = f"""
+                SELECT code, name, credits, semester
+                FROM new_curriculum_subject
+                WHERE code NOT IN ({placeholders})
+            """
+            params = tuple(approved_subjects)
+
+        self._connection.row_factory = sqlite3.Row
+        cursor = self._connection.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+
+        return [
+            NewPensumSubject(
+                code=row["code"],
+                name=row["name"],
+                credits=row["credits"],
+                semester=row["semester"],
+            )
+            for row in rows
+        ]

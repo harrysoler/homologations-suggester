@@ -14,3 +14,8 @@ class SubjectRepository(Protocol):
     def find_homologable_subject_for(old_subject_code: SubjectCode) -> NewPensumSubject | None:
         ...
 
+    def find_pending_subjects_from_new_pensum(approved_subjects: list[SubjectCode]) -> list[NewPensumSubject]:
+        """
+        Get all the subjects from the new pensum excluding the already approved
+        """
+        ...

@@ -4,6 +4,9 @@ from typing import Annotated, TypeAlias
 
 import rich
 import typer
+import click
+import platform
+import ctypes
 
 import utils
 from constants import (
@@ -80,27 +83,44 @@ class TyperCLIHandler:
         template: TemplateOption = DEFAULT_TEMPLATE_PATH,
         database: DatabaseOption = DEFAULT_DATABASE_PATH
     ):
-        files_extracted_from_path = utils.resolve_path(path, "pdf")
+        try:
+            files_extracted_from_path = utils.resolve_path(path, "pdf")
 
-        subject_repository = self._subject_repository(database, self._logger)
+            subject_repository = self._subject_repository(database, self._logger)
         
-        self._homologable_subjects_service = HomologableSubjectsService(
-            subject_repository,
-            self._logger
-        )
+            self._homologable_subjects_service = HomologableSubjectsService(
+                subject_repository,
+                self._logger
+            )
 
-        self._pending_subjects_service = PendingSubjectsService(
-            subject_repository,
-            self._logger
-        )
+            self._pending_subjects_service = PendingSubjectsService(
+                subject_repository,
+                self._logger
+            )
 
-        self._report_service = StudentReportService(
-            self._homologation_report_gateway(template),
-            self._pending_subjects_report_gateway,
-            self._logger
-        )
+            self._report_service = StudentReportService(
+                self._homologation_report_gateway(template),
+                self._pending_subjects_report_gateway,
+                self._logger
+            )
 
-        self._process_files(files_extracted_from_path)
+            self._process_files(files_extracted_from_path)
+        except ValueError as error:
+            self._handle_error(error)
+
+    def _handle_error(self, error: ValueError):
+        self._logger.error(error, exc_info=True)
+
+        click.clear()
+        typer.secho(f"Error: {error}, check log file", err=True)
+
+        # show dialog if running in windows
+        if platform.system() == "Windows":
+            message_box = ctypes.windll.user32.MessageBoxW
+            message_box(None, str(error), "Error", 0)
+
+        raise typer.Exit(code=1)
+        
 
     def _process_files(self, files: list[Path]):
         status = CLIReportsStatus(len(files))

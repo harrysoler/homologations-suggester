@@ -6,7 +6,7 @@ from adapter.subject_repository.sqlite import SQLiteSubjectRepository
 
 DEFAULT_DATABASE_PATH = "transition_plan.db"
 TOTAL_NEW_PENSUM_SUBJECTS = 48
-TOTAL_SUBJECT_PREREQUISITES = 20
+TOTAL_SUBJECT_PREREQUISITES = 21
 
 @pytest.fixture
 def sqlite_subject_repository():

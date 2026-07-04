@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from entities import OldPensumSubject, NewPensumSubject
-from shared_types import SubjectCode, SubjectPrerequisite
+from shared_types import SubjectCode, SubjectPrerequisites
 
 
 class SubjectRepository(Protocol):
@@ -20,7 +20,7 @@ class SubjectRepository(Protocol):
         """
         ...
 
-    def find_all_new_subject_prerequisites() -> list[SubjectPrerequisite]:
+    def find_all_new_subject_prerequisites() -> SubjectPrerequisites:
         """
         Get all the prerequisites in form of subject codes
         """

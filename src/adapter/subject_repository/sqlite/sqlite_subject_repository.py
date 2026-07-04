@@ -1,10 +1,11 @@
 import sqlite3
+from collections import defaultdict
 from logging import Logger
 from pathlib import Path
 
 from entities import NewPensumSubject, OldPensumSubject
+from shared_types import SubjectCode, SubjectPrerequisites
 from subject_repository import SubjectRepository
-from shared_types import SubjectCode, SubjectPrerequisite
 
 
 class SQLiteSubjectRepository(SubjectRepository):
@@ -123,7 +124,7 @@ class SQLiteSubjectRepository(SubjectRepository):
             for row in rows
         ]
 
-    def find_all_new_subject_prerequisites(self) -> list[SubjectPrerequisite]:
+    def find_all_new_subject_prerequisites(self) -> SubjectPrerequisites:
         query = """
             SELECT subject_code, prerequisite_subject_code
             FROM prerequisite
@@ -134,4 +135,9 @@ class SQLiteSubjectRepository(SubjectRepository):
         cursor.execute(query)
         rows = cursor.fetchall()
 
-        return [{row["subject_code"]: row["prerequisite_subject_code"]} for row in rows]
+        prerequisites: SubjectPrerequisites = defaultdict(list)
+
+        for row in rows:
+            prerequisites[row["subject_code"]].append(row["prerequisite_subject_code"])
+
+        return prerequisites

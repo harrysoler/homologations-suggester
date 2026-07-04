@@ -6,7 +6,9 @@ Grade: TypeAlias = float
 SubjectCode: TypeAlias = int
 SubjectName: TypeAlias = str
 SubjectCredits: TypeAlias = int
-SubjectPrerequisite: TypeAlias = Mapping[SubjectCode, SubjectCode]
+
+# one subject can have more than one prerequisite
+SubjectPrerequisites: TypeAlias = Mapping[SubjectCode, list[SubjectCode]]
 
 StudentName: TypeAlias = str
 StudentIdentification: TypeAlias = int

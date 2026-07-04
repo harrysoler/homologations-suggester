@@ -22,7 +22,7 @@ class CLIReportsStatus:
         self._progress.start()
 
     def add_finished_reports(self, student_name: str, reports_path: list[Path]):
-        self._console.log(f"[green]✓[/green] {student_name}: [grey30]{", ".join(reports_path)}[/grey30]")
+        self._console.log(f"[green]✓[/green] {student_name}: [grey50]{" | ".join(reports_path)}[/grey50]")
 
         self._progress.update(self._task_id, advance=1)
 

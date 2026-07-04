@@ -4,11 +4,10 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
+from constants import DEFAULT_HOMOLOGATION_REPORTS_DIR
 from entities import ApprovedSubject, HomologationReportData
 from gateways import HomologationReportGateway
 from shared_types import ReportGenerationResult
-
-REPORTS_DIR = Path("homologation_reports")
 
 DEFAULT_FORMATION_LEVEL = "Pregrado"
 DEFAULT_IDENTIFICATION_TYPE = "Cédula de Ciudadania"
@@ -49,8 +48,9 @@ class XLSXHomologationReportGateway(HomologationReportGateway):
         return f'{safe_name}.xlsx'
 
     def generate_report(self, student: HomologationReportData) -> str:
-        REPORTS_DIR.mkdir(exist_ok=True)
-        output_path: Path = REPORTS_DIR / self._build_filename(student.name)
+        DEFAULT_HOMOLOGATION_REPORTS_DIR.mkdir(exist_ok=True)
+        filename = self._build_filename(student.name)
+        output_path: Path = DEFAULT_HOMOLOGATION_REPORTS_DIR / filename
 
         shutil.copy2(self._template_path, output_path)
 
@@ -84,7 +84,7 @@ class XLSXHomologationReportGateway(HomologationReportGateway):
 
         wb.save(output_path)
 
-        return str(output_path)
+        return filename
 
     def _fill_subjects(self, ws, subjects: list[ApprovedSubject]):
         current_row = SUBJECTS_TABLE_START_ROW

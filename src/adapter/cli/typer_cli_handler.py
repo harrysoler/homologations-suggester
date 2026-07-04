@@ -2,9 +2,14 @@ from logging import Logger
 from pathlib import Path
 from typing import Annotated, TypeAlias
 
+import rich
 import typer
 
 import utils
+from constants import (
+    DEFAULT_HOMOLOGATION_REPORTS_DIR,
+    DEFAULT_PENDING_SUBJECTS_REPORTS_DIR,
+)
 from entities import ApprovedSubject, HomologationReportData, PendingSubjectsReportData
 from gateways import (
     HomologationReportGateway,
@@ -127,6 +132,8 @@ class TyperCLIHandler:
             status.add_finished_reports(student.name, [homologation_report_result, pending_subjects_report_result])
 
         status.stop()
+
+        rich.print(f"[green]Reports generated at folders [yellow]{DEFAULT_HOMOLOGATION_REPORTS_DIR}[/yellow] and [yellow]{DEFAULT_PENDING_SUBJECTS_REPORTS_DIR}[/yellow][/green]")
 
     def _extract_codes_from_approved_subjects(self, subjects: list[ApprovedSubject]) -> list[SubjectCode]:
         return list(map(lambda approved: approved.target_subject.code, subjects))

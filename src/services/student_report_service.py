@@ -1,34 +1,19 @@
 import logging
 from dataclasses import dataclass
 
-from entities import Student, HomologationReportData
-from gateways import HomologationReportGateway
-from services import HomologableSubjectsService
+from entities import HomologationReportData, PendingSubjectsReportData
+from gateways import HomologationReportGateway, PendingSubjectsReportGateway
 from shared_types import ReportGenerationResult
 
 
 @dataclass(frozen=True)
 class StudentReportService:
-    _report_gateway: HomologationReportGateway
-    _homologable_subjects_service: HomologableSubjectsService
+    _homologation_report_gateway: HomologationReportGateway
+    _pending_subjects_report_gateway: PendingSubjectsReportGateway
     _logger: logging.Logger
 
-    def generate_report_from(self, student: Student) -> ReportGenerationResult:
-        analysis = self._build_report_data(student)
+    def generate_homologation_report(self, homologation_data: HomologationReportData) -> ReportGenerationResult:
+        return self._homologation_report_gateway.generate_report(homologation_data)
 
-        return self._report_gateway.generate_report(analysis)
-
-    def _build_report_data(self, student: Student) -> HomologationReportData:
-        homologable_subjects = (
-            self
-            ._homologable_subjects_service
-            .suggest_subjects(student.grades)
-        )
-
-        return HomologationReportData(
-            student.name,
-            student.identification,
-            student.grades,
-            homologable_subjects
-        )
-        
+    def generate_pending_subjects_report(self, pending_subjects_data: PendingSubjectsReportData) -> ReportGenerationResult:
+        return self._pending_subjects_report_gateway.generate_report(pending_subjects_data)

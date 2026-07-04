@@ -5,8 +5,18 @@ from typing import Annotated, TypeAlias
 import typer
 
 import utils
-from gateways import StudentInfoGateway, HomologationReportGateway
-from services import HomologableSubjectsService, StudentReportService
+from entities import ApprovedSubject, HomologationReportData, PendingSubjectsReportData
+from gateways import (
+    HomologationReportGateway,
+    PendingSubjectsReportGateway,
+    StudentInfoGateway,
+)
+from services import (
+    HomologableSubjectsService,
+    PendingSubjectsService,
+    StudentReportService,
+)
+from shared_types import SubjectCode
 from subject_repository import SubjectRepository
 
 from .reports_status import CLIReportsStatus
@@ -20,21 +30,31 @@ DatabaseOption: TypeAlias = Annotated[Path, typer.Option(help="Path to the SQLit
 
 class TyperCLIHandler:
     _subject_repository: SubjectRepository
-    _report_gateway: HomologationReportGateway
+
     _info_gateway: StudentInfoGateway
+    _homologation_report_gateway: HomologationReportGateway
+    _pending_subjects_report_gateway: PendingSubjectsReportGateway
+
+    _homologable_subjects_service: HomologableSubjectsService
+    _report_service: StudentReportService
+    _pending_subjects_service: PendingSubjectsService
+
     _logger: Logger
     _app: typer.Typer
 
     def __init__(
         self,
         subject_repository: type[SubjectRepository],
-        student_report_gateway: HomologationReportGateway,
         student_info_gateway: StudentInfoGateway,
+        homologation_report_gateway: type[HomologationReportGateway],
+        pending_subjects_report_gateway: PendingSubjectsReportGateway,
         logger: Logger
     ):
         self._subject_repository = subject_repository
-        self._report_gateway = student_report_gateway
+
         self._info_gateway = student_info_gateway
+        self._homologation_report_gateway = homologation_report_gateway
+        self._pending_subjects_report_gateway = pending_subjects_report_gateway
 
         self._logger = logger
 
@@ -57,20 +77,27 @@ class TyperCLIHandler:
     ):
         files_extracted_from_path = utils.resolve_path(path, "pdf")
 
-        homologable_subjects_service = HomologableSubjectsService(
-            self._subject_repository(database, self._logger),
+        subject_repository = self._subject_repository(database, self._logger)
+        
+        self._homologable_subjects_service = HomologableSubjectsService(
+            subject_repository,
             self._logger
         )
 
-        report_service = StudentReportService(
-            self._report_gateway(template),
-            homologable_subjects_service,
+        self._pending_subjects_service = PendingSubjectsService(
+            subject_repository,
             self._logger
         )
 
-        self._process_files(files_extracted_from_path, report_service)
+        self._report_service = StudentReportService(
+            self._homologation_report_gateway(template),
+            self._pending_subjects_report_gateway,
+            self._logger
+        )
 
-    def _process_files(self, files: list[Path], report_service: StudentReportService):
+        self._process_files(files_extracted_from_path)
+
+    def _process_files(self, files: list[Path]):
         status = CLIReportsStatus(len(files))
 
         for file in files:
@@ -79,12 +106,27 @@ class TyperCLIHandler:
 
             student = self._info_gateway.extract_student_from(file)
 
-            self._logger.info("    generating report")
+            self._logger.info("generating homologation report")
 
-            report_result = report_service.generate_report_from(student)
+            approved_subjects = self._homologable_subjects_service.suggest_subjects(student.grades)
+            homologation_data = HomologationReportData.from_student(student, approved_subjects)
 
-            self._logger.info(f"    report generated at {report_result}")
+            homologation_report_result = self._report_service.generate_homologation_report(homologation_data)
 
-            status.add_finished_report(student.name, report_result)
+            self._logger.info("generating pending subjects report")
+
+            approved_codes = self._extract_codes_from_approved_subjects(approved_subjects)
+            pending_subjects = self._pending_subjects_service.get_pending_subjects(approved_codes)
+
+            pending_subjects_data = PendingSubjectsReportData.from_student(student, pending_subjects)
+
+            pending_subjects_report_result = self._report_service.generate_pending_subjects_report(pending_subjects_data)
+
+            self._logger.info("reports generated")
+
+            status.add_finished_reports(student.name, [homologation_report_result, pending_subjects_report_result])
 
         status.stop()
+
+    def _extract_codes_from_approved_subjects(self, subjects: list[ApprovedSubject]) -> list[SubjectCode]:
+        return list(map(lambda approved: approved.target_subject.code, subjects))

@@ -2,8 +2,9 @@ import logging
 
 from adapter.cli import TyperCLIHandler
 from adapter.student_info_gateway.pdf import PDFStudentInfoGateway
-from adapter.student_report_gateway.xlsx import XLSXStudentReportGateway
+from adapter.homologation_report_gateway.xlsx import XLSXHomologationReportGateway
 from adapter.subject_repository.sqlite import SQLiteSubjectRepository
+from adapter.pending_subjects_report_gateway.txt import TXTPendingSubjectsReportGateway
 
 LOGGING_FORMAT = "%(message)s"
 
@@ -22,8 +23,9 @@ def main():
 
     cli = TyperCLIHandler(
         SQLiteSubjectRepository,
-        XLSXStudentReportGateway,
         PDFStudentInfoGateway(logger),
+        XLSXHomologationReportGateway,
+        TXTPendingSubjectsReportGateway(),
         logger
     )
 

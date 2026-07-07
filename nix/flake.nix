@@ -33,6 +33,8 @@
         ty
 
         libsForQt5.qt5.qtwayland
+      ] ++ [
+        pkgs-unstable.act
       ];
 
       shellHook = ''

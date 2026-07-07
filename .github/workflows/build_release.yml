@@ -1,0 +1,29 @@
+name: Package release with PyInstaller
+
+on:
+  workflow_dispatch:
+  # push:
+  #   tags:
+  #     - 'v*'
+
+env:
+  EXECUTABLE_NAME: "homologations_suggester"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@d31148d669074a8d0a63714ba94f3201e7020bc3
+        with:
+          version: "0.7.4"
+          python-version: "3.13"
+      - name: Compile executable
+        run: uv run pyinstaller --name="${{ env.EXECUTABLE_NAME }}" --onefile ./src/main.py
+      - name: Package application
+        uses: montudor/action-zip@v1
+        with:
+          args: zip homologations-suggester-x86_64-windows.zip dist/${{ env.EXECUTABLE_NAME }}.py transition_plan.db template.xlsx
+

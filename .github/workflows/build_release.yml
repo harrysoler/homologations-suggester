@@ -25,5 +25,34 @@ jobs:
       - name: Package application
         uses: montudor/action-zip@v1
         with:
-          args: zip homologations-suggester-x86_64-windows.zip dist/${{ env.EXECUTABLE_NAME }}.py transition_plan.db template.xlsx
-
+          args: zip homologations-suggester-x86_64-windows.zip dist/${{ env.EXECUTABLE_NAME }}.exe transition_plan.db template.xlsx
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-x86_64-artifact
+          path: dist/${{ env.EXECUTABLE_NAME }}.exe
+          overwrite: true
+          archive: false
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@d31148d669074a8d0a63714ba94f3201e7020bc3
+        with:
+          version: "0.7.4"
+          python-version: "3.13"
+      - name: Compile executable
+        run: uv run pyinstaller --name="${{ env.EXECUTABLE_NAME }}" --onefile ./src/main.py
+      - name: Package application
+        uses: montudor/action-zip@v1
+        with:
+          args: zip homologations-suggester-x86_64-windows.zip dist/${{ env.EXECUTABLE_NAME }} transition_plan.db template.xlsx
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-x86_64-artifact
+          path: dist/${{ env.EXECUTABLE_NAME }}
+          overwrite: true
+          archive: false

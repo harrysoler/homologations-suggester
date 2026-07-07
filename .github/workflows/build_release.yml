@@ -61,11 +61,11 @@ jobs:
       - name: Archive windows release
         uses: montudor/action-zip@v1
         with:
-          args: zip homologations-suggester-x86_64-windows.zip artifacts/${{ env.EXECUTABLE_NAME }}.exe transition_plan.db template.xlsx
+          args: zip -j homologations-suggester-x86_64-windows.zip artifacts/${{ env.EXECUTABLE_NAME }}.exe transition_plan.db template.xlsx
       - name: Archive linux release
         uses: montudor/action-zip@v1
         with:
-          args: zip homologations-suggester-x86_64-linux.zip artifacts/${{ env.EXECUTABLE_NAME }} transition_plan.db template.xlsx
+          args: zip -j homologations-suggester-x86_64-linux.zip artifacts/${{ env.EXECUTABLE_NAME }} transition_plan.db template.xlsx
       - name: Release artifacts
         uses: softprops/action-gh-release@v3
         with:

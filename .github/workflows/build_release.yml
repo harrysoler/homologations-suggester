@@ -1,10 +1,9 @@
 name: Package release with PyInstaller
 
 on:
-  workflow_dispatch:
-  # push:
-  #   tags:
-  #     - 'v*'
+  push:
+    tags:
+      - 'v*'
 
 env:
   EXECUTABLE_NAME: "homologations_suggester"
@@ -67,3 +66,9 @@ jobs:
         uses: montudor/action-zip@v1
         with:
           args: zip homologations-suggester-x86_64-linux.zip artifacts/${{ env.EXECUTABLE_NAME }} transition_plan.db template.xlsx
+      - name: Release artifacts
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            homologations-suggester-x86_64-linux.zip
+            homologations-suggester-x86_64-windows.zip

@@ -7,7 +7,9 @@ The old and new pensum subjects information is allocated in a file-based SQLite 
 
 ![SQLite subjects database diagram](assets/db_diagram.png)
 
-# Student grades historic
+# Resources
+
+## Student grades historic
 
 From the PDF file are extracted the following data:
 
@@ -15,7 +17,7 @@ From the PDF file are extracted the following data:
 - Identification
 - Subject codes with his respective grade
 
-# XLSX Homologation report
+## XLSX Homologation report
 
 The homologation format is filled with the following data:
 
@@ -23,6 +25,26 @@ The homologation format is filled with the following data:
 - Identification
 - Total number of credits approved
 - Subjects relation from the old pensum to the new one
+
+## TXT Pending subjects report
+
+The script creates a TXT report with the pending subjects in semester order (with career subjects priority) taking into account the grades historic.
+
+# Running
+
+Is required to have installed `UV` version `>=0.7.4`. To run the project is required to have `transition_plan.db` and `template.xlsx` in the same path:
+
+```bash
+uv run src/main.py
+```
+
+# Compiling
+
+The compiling process involves the `pyinstaller` library resulting in a single executable. Is still required to have `transition_plan.db` and `template.xlsx` in the same path:
+
+```bash
+uv run pyinstaller --onefile ./src/main.py
+```
 
 # Architecture
 

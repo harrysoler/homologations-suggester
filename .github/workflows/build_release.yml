@@ -49,6 +49,7 @@ jobs:
           overwrite: true
           archive: false
   upload-release:
+    needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
